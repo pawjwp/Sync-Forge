@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.sumik.sync.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "sync.refmap.json",
+  "mixins": [
+    "sync.common.LivingEntityMixin",
+    "sync.common.MinecraftServerMixin",
+    "sync.common.PlayerEntityMixin",
+    "sync.common.ServerPlayerEntityMixin"
+  ],
+  "client": [
+    "sync.client.ClientPlayerEntityMixin",
+    "sync.client.ClientPlayerInteractionManagerMixin",
+    "sync.client.EntityMixin",
+    "sync.client.EntityRenderDispatcherMixin",
+    "sync.client.LivingEntityRendererAccessor",
+    "sync.client.MinecraftClientMixin",
+    "sync.client.PlayerEntityModelMixin",
+    "sync.client.WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
