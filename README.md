@@ -75,7 +75,7 @@ P.S. - If you aren't brave enough to fight the Wither in Hardcore, you can use [
 
 ## Config
 
-The mod is highly configurable. The config is located at `./config/sync-common.toml` and by default looks like this:
+The mod is highly configurable. The config is located at `./config/sync-common.toml` by default looks like this:
 
 ```
 #Sync Configuration
