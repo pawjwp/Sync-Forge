@@ -75,52 +75,92 @@ P.S. - If you aren't brave enough to fight the Wither in Hardcore, you can use [
 
 ## Config
 
-The mod is highly configurable. Changing config options requires [Cloth Config API](https://modrinth.com/mod/cloth-config). The config is located at `./config/sync.json` and by default looks like this:
+The mod is highly configurable. The config is located at `./config/sync-common.toml` and by default looks like this:
 
-```json
-{
-  "enableInstantShellConstruction": false,
-  "warnPlayerInsteadOfKilling": false,
-  "fingerstickDamage": 20.0,
-  "hardcoreFingerstickDamage": 40.0,
-  "shellConstructorCapacity": 256000,
-  "shellStorageCapacity": 320,
-  "shellStorageConsumption": 16,
-  "shellStorageAcceptsRedstone": true,
-  "shellStorageMaxUnpoweredLifespan": 20,
-  "energyMap": [
-    {
-      "entityId": "minecraft:chicken",
-      "outputEnergyQuantity": 2
-    },
-    {
-      "entityId": "minecraft:pig",
-      "outputEnergyQuantity": 16
-    },
-    {
-      "entityId": "minecraft:player",
-      "outputEnergyQuantity": 20
-    },
-    {
-      "entityId": "minecraft:wolf",
-      "outputEnergyQuantity": 24
-    },
-    {
-      "entityId": "minecraft:creeper",
-      "outputEnergyQuantity": 80
-    },
-    {
-      "entityId": "minecraft:enderman",
-      "outputEnergyQuantity": 160
-    }
-  ],
-  "preserveOrigins": false,
-  "syncPriority": [
-    { "priority": "NATURAL" }
-  ],
-  "wrench": "minecraft:stick",
-  "updateTranslationsAutomatically": false
-}
+```
+#Sync Configuration
+[general]
+
+	#Shell Construction Settings
+	[general.construction]
+		#Enable instant shell construction (creative mode-like)
+		enableInstantShellConstruction = false
+		#Warn player instead of killing them on sync failure
+		warnPlayerInsteadOfKilling = false
+		#Damage dealt by fingerstick (0-100)
+		#Range: 0.0 ~ 100.0
+		fingerstickDamage = 20.0
+		#Damage dealt by fingerstick in hardcore mode (0-100)
+		#Range: 0.0 ~ 100.0
+		hardcoreFingerstickDamage = 40.0
+		#Item required to construct a new shell (format: 'modid:itemname', e.g., 'minecraft:ender_pearl')
+		#Leave empty to disable item requirement
+		shellConstructionRequiredItem = ""
+		#Number of items consumed when constructing a shell
+		#Range: 1 ~ 64
+		shellConstructionItemCount = 1
+		#Should the required item be consumed in creative mode?
+		consumeItemInCreative = false
+		#Custom error message when missing required item (use %s for item name, %d for count)
+		missingItemMessage = "You need %s x%d to construct a new shell!"
+
+	#Shell Storage Settings
+	[general.storage]
+		#Energy capacity of shell constructor
+		#Range: 1000 ~ 9223372036854775807
+		shellConstructorCapacity = 256000
+		#Energy capacity of shell storage
+		#Range: 10 ~ 9223372036854775807
+		shellStorageCapacity = 320
+		#Energy consumption per tick for shell storage
+		#Range: 1 ~ 1000
+		shellStorageConsumption = 16
+		#Whether shell storage accepts redstone power
+		shellStorageAcceptsRedstone = true
+		#Maximum ticks shell storage can run without power
+		#Range: 0 ~ 1200
+		shellStorageMaxUnpoweredLifespan = 20
+
+	#Energy Generation
+	[general.energy]
+		#Entity energy output mapping (format: 'modid:entity=energyAmount')
+		energyMap = ["minecraft:chicken=2", "minecraft:pig=16", "minecraft:player=20", "minecraft:wolf=22", "minecraft:villager=25", "minecraft:creeper=80", "minecraft:enderman=160"]
+
+	#Gameplay Settings
+	[general.gameplay]
+		#Priority for shell selection (NATURAL, NEAREST, or color names)
+		#Allowed Values: WHITE, ORANGE, MAGENTA, LIGHT_BLUE, YELLOW, LIME, PINK, GRAY, LIGHT_GRAY, CYAN, PURPLE, BLUE, BROWN, GREEN, RED, BLACK, NEAREST, NATURAL
+		syncPriority = "NATURAL"
+
+	#Tools
+	[general.tools]
+		#Item to use as wrench (format: 'modid:item')
+		wrench = "minecraft:stick"
+
+	#Client Settings
+	[general.client]
+		#Automatically update translations
+		updateTranslationsAutomatically = false
+		#Enable camera animation when switching between shells
+		enableShellSwitchAnimation = true
+		#Enable camera animation when respawning into a shell after death
+		enableDeathRespawnAnimation = true
+
+	#Easter Eggs
+	[general.easter_eggs]
+		#Enable Technoblade easter egg
+		enableTechnobladeEasterEgg = true
+		#Render Technoblade's cape
+		renderTechnobladeCape = false
+		#Allow Technoblade announcements
+		allowTechnobladeAnnouncements = true
+		#Allow Technoblade quotes
+		allowTechnobladeQuotes = true
+		#Delay between Technoblade quotes (in ticks)
+		#Range: 200 ~ 72000
+		technobladeQuoteDelay = 1800
+		#UUIDs of players to treat as Technoblade
+		technobladeUuids = []
 ```
 
 | Name | Description | Default value |
@@ -168,7 +208,7 @@ Requirements:
 
 You can download the mod from:
 
- - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/sync-fabric)
+ - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/sync-forge)
  - [GitHub Actions](https://github.com/pawjwp/sync-fabric/actions/workflows/build-artifacts.yml) *(these builds may be unstable, but they represent the actual state of the development)*
 
 ## Developers
