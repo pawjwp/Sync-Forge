@@ -1,4 +1,4 @@
-![Logo](media/logo.png)
+![Logo](https://github.com/VTSumik/Sync-Forge/raw/main/media/logo.png)
 
 # Sync (Forge)
 [![CurseForge](https://img.shields.io/badge/dynamic/json?color=%23f16436&label=CurseForge&query=title&url=https%3A%2F%2Fapi.cfwidget.com%2F515365&cacheSeconds=3600)](https://www.curseforge.com/minecraft/mc-mods/sync-forge)
@@ -8,28 +8,29 @@
 
 The original description says it all:
 
-> Sync provides clones, or as we like to call it, "shells". These shells are basically a new individual, with their own inventory, experience level, and even gamemode.
-> \
-> \
-> However, what they lack, is a mind to control them. That’s where the player comes in. Each shell is biometrically tied to the player who’s sample is used to create it, and will allow the player to "sync" their mind to the other shell, essentially creating multiple player instances.
+Sync provides clones, or as we like to call it, "shells". These shells are basically a new individual, with their own inventory, experience level, and even gamemode.
+
+However, what they lack, is a mind to control them. That’s where the player comes in. Each shell is biometrically tied to the player who’s sample is used to create it, and will allow the player to "sync" their mind to the other shell, essentially creating multiple player instances.
 
 ----
 
+(The Curseforge description doesn't support all the markdown options that other platforms do, see the description on [Github](https://github.com/VTSumik/Sync-Forge) for the best representation.)
+
 ## How to play
 
- 1. You need to craft a `shell constructor` and place it down.
- 2. Then you need to provide it with a genetic sample (just `right-click` it).\
+- You need to craft a `shell constructor` and place it down.
+- Then you need to provide it with a genetic sample (just `right-click` it).\
  **⚠️WARNING: with the default config, this action will KILL you!** In order to create a shell with full health, the constructor must absorb 20HP *(40 for Hardcore players)*. If you don't want to die, you can eat a golden apple to increase your maximum health, or you can hold a totem of undying during the process *(which is the only option for Hardcore players)*.
- 3. The shell constructor needs power to work, so put a `treadmill` next to it *(it should touch any side of any part of the shell constructor)* and lure a `pig` or a `wolf` to its center to start generating piggawatts.\
+- The shell constructor needs power to work, so put a `treadmill` next to it *(it should touch any side of any part of the shell constructor)* and lure a `pig` or a `wolf` to its center to start generating piggawatts.\
  You should end up with something like this:
- ![Example of working shell constructor](media/shell_constructor-showcase.png)\
- <sub>You don't really need a comparator, it's here just to demonstrate that you can determine progress of the shell construction process via strength of the comparator output.</sub>
- 4. Once your new shell is constructed, you need to craft a `shell storage` and place it down.
- 5. Supply it with `redstone power`.
- 6. Once doors of the shell storage are open, you can `walk into it`.
- 7. You'll see a radial `menu` that displays your shells:
- ![Menu example](media/menu-showcase.png)
- 8. `Select` the shell you want to transfer your mind into, and enjoy the process!
+ ![Example of working shell constructor](https://github.com/VTSumik/Sync-Forge/raw/main/media/shell_constructor-showcase.png)\
+(You don't really need a comparator, it's here just to demonstrate that you can determine progress of the shell construction process via strength of the comparator output.)
+- Once your new shell is constructed, you need to craft a `shell storage` and place it down.
+- Supply it with `redstone power`.
+- Once doors of the shell storage are open, you can `walk into it`.
+- You'll see a radial `menu` that displays your shells:
+ ![Menu example](https://github.com/VTSumik/Sync-Forge/raw/main/media/menu-showcase.png)
+- `Select` the shell you want to transfer your mind into, and enjoy the process!
 
  ## Notes
 
@@ -39,31 +40,31 @@ The original description says it all:
   - Death of a shell doesn't increase your death counter.
   - Shell can be equipped (or unequipped) with armor, tools, etc. via hoppers connected to a corresponding shell container.
   - Shell storage should be constantly supplied with power in order to keep stored shell alive (configurable).
-    - Shell storage can be powered by redstone, if the `shellStorageAcceptsRedstone` option is set to `true`.
-    - Shell storage can be powered by any valid energy source (e.g., treadmills, machinery from popular tech mods, etc.).
+   - Shell storage can be powered by redstone, if the `shellStorageAcceptsRedstone` option is set to `true`.
+   - Shell storage can be powered by any valid energy source (e.g., treadmills, machinery from popular tech mods, etc.).
   - It's possible to measure a shell container's state with a comparator.
-    - You can determine progress of the shell construction process via strength of the comparator output.
-    - You can measure the fullness of a shell's inventory via strength of the comparator output.
-    - You can change a comparator output type by right-clicking on a shell container with a wrench.
+   - You can determine progress of the shell construction process via strength of the comparator output.
+   - You can measure the fullness of a shell's inventory via strength of the comparator output.
+   - You can change a comparator output type by right-clicking on a shell container with a wrench.
   - Shell storage and shell constructor are pretty fragile, so don't try to mine them without `silk touch` enchantment.
 
 ## Crafting recipes
 
 #### Sync Core:
 
-![Sync Core: Daylight Detector + Lapis Block + Daylight Detector + Quartz + Ender Pearl + Quartz + Emerald + Redstone Block + Emerald](media/sync_core-recipe.png)
+![Sync Core: Daylight Detector + Lapis Block + Daylight Detector + Quartz + Ender Pearl + Quartz + Emerald + Redstone Block + Emerald](https://github.com/VTSumik/Sync-Forge/raw/main/media/sync_core-recipe.png)
 
 #### Shell Constructor:
 
-![Shell Constructor: Gray Concrete + Sync Core + Gray Concrete + Glass Pane + Glass Pane + Glass Pane + Gray Concrete + Redstone + Gray Concrete](media/shell_constructor-recipe.png)
+![Shell Constructor: Gray Concrete + Sync Core + Gray Concrete + Glass Pane + Glass Pane + Glass Pane + Gray Concrete + Redstone + Gray Concrete](https://github.com/VTSumik/Sync-Forge/raw/main/media/shell_constructor-recipe.png)
 
 #### Shell Storage:
 
-![Shell Storage: Gray Concrete + Sync Core + Gray Concrete + Glass Pane + Iron Block + Glass Pane + Gray Concrete + Heavy Weighted Pressure Plate + Gray Concrete](media/shell_storage-recipe.png)
+![Shell Storage: Gray Concrete + Sync Core + Gray Concrete + Glass Pane + Iron Block + Glass Pane + Gray Concrete + Heavy Weighted Pressure Plate + Gray Concrete](https://github.com/VTSumik/Sync-Forge/raw/main/media/shell_storage-recipe.png)
 
 #### Treadmill:
 
-![Treadmill: Air + Air + Daylight Detector + Gray Carpet + Gray Carpet + Iron Bars + Gray Concrete + Gray Concrete + Redstone](media/treadmill-recipe.png)
+![Treadmill: Air + Air + Daylight Detector + Gray Carpet + Gray Carpet + Iron Bars + Gray Concrete + Gray Concrete + Redstone](https://github.com/VTSumik/Sync-Forge/raw/main/media/treadmill-recipe.png)
 
 ----
 
@@ -170,7 +171,7 @@ The mod is highly configurable. The config is located at `./config/sync-common.t
 | `shellStorageMaxUnpoweredLifespan` | Determines how many ticks a shell can survive without a power supply connected to the corresponding shell storage | `20` |
 | `energyMap` | Specifies a list of entities that can produce energy via treadmills | [...](#user-content-config) |
 | `preserveOrigins` | If this option is enabled, all user shells will share the same [origins](https://www.curseforge.com/minecraft/mc-mods/origins) | `false` |
-| `syncPriority` | The order of shell selection for synchronization in case of death <br><br>Available `priority` values:<br><ul><li>`NATURAL` - non-artificial shells are prioritized</li><li>`NEAREST` - nearest shells are prioritized</li><li>`WHITE`, `ORANGE`, `MAGENTA`, `LIGHT_BLUE`, `YELLOW`, `LIME`, `PINK`, `GRAY`, `LIGHT_GRAY`, `CYAN`, `PURPLE`, `BLUE`, `BROWN`, `GREEN`, `RED`, `BLACK` - shells of the given color are prioritized</li><ul> | `[{ "priority": "NATURAL" }]` |
+| `syncPriority` | The order of shell selection for synchronization in case of death | `[{ "priority": "NATURAL" }]` |
 | `wrench` | Identifier of an item that can be used as a wrench in order to change a shell constructor's state | `minecraft:stick` |
 | `updateTranslationsAutomatically` | If this option is enabled, translations will be updated every time the game is launched | `false` |
 
@@ -198,41 +199,13 @@ You can download the mod from:
 
  - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/sync-forge)
 
-## Developers
-
-There's [no documentation](https://www.commitstrip.com/en/2021/11/10/no-documentation/) for the project's [api](https://github.com/Kir-Antipov/sync-fabric/tree/1.17.x/dev/src/main/java/stable/kir/sync/api) yet, but you can find some useful examples in the [`compat` package](https://github.com/Kir-Antipov/sync-fabric/tree/1.17.x/stable/src/main/java/dev/kir/sync/compat).
-
-## Building from sources
-
-Requirements:
- - JDK `17`
-
-### Linux/MacOS
-
-```cmd
-git https://github.com/VTSumik/Sync-Forge.git
-cd Sync-Forge
-
-chmod +x ./gradlew
-./gradlew build
-cd build/libs
-```
-### Windows
-
-```cmd
-git clone hhttps://github.com/VTSumik/Sync-Forge.git
-cd Sync-Forge
-
-gradlew build
-cd build/libs
-```
-
 ----
 
 ## License
 
 Created by [Kir_Antipov](https://github.com/Kir-Antipov), licensed under MIT license.\
 Originally made by [iChun](https://github.com/iChun) under GNU LGPLv3 license.
+
 
 ```
 Copyright (C) 2021 Kir_Antipov
@@ -255,6 +228,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
 
 [Sync (Fabric)](https://github.com/Kir-Antipov/sync-fabric) was originally licensed under GNU LGPLv3 license to conform to [the original mod](https://github.com/iChun/Sync), but since the project is not a port, but a reimplementation with its own unique codebase, I got permission from [iChun](https://github.com/iChun) to change the license to MIT.
 
