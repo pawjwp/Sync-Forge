@@ -1,5 +1,6 @@
 package net.sumik.sync;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,11 +19,13 @@ import net.sumik.sync.common.config.SyncConfig;
 import net.sumik.sync.common.item.SyncCreativeTabs;
 import net.sumik.sync.common.item.SyncItems;
 import net.sumik.sync.networking.SyncPackets;
+import org.slf4j.Logger;
 
 @Mod(Sync.MOD_ID)
 public class Sync {
     public static final String MOD_ID = "sync";
     public static final String NAME = "Sync";
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public Sync() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
