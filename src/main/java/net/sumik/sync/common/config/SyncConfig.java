@@ -45,6 +45,10 @@ public class SyncConfig {
         return COMMON.warnPlayerInsteadOfKilling.get();
     }
 
+    public boolean mustMaintainOriginalBody() {
+        return COMMON.mustMaintainOriginalBody.get();
+    }
+
     public float fingerstickDamage() {
         return COMMON.fingerstickDamage.get().floatValue();
     }
@@ -204,6 +208,7 @@ public class SyncConfig {
     public static class CommonConfig {
         public final BooleanValue enableInstantShellConstruction;
         public final BooleanValue warnPlayerInsteadOfKilling;
+        public final BooleanValue mustMaintainOriginalBody;
         public final DoubleValue fingerstickDamage;
         public final DoubleValue hardcoreFingerstickDamage;
         public final ConfigValue<String> shellConstructionRequiredItem;
@@ -234,6 +239,7 @@ public class SyncConfig {
             this.enableInstantShellConstruction = builder.comment("Enable instant shell construction (creative mode-like)")
                 .define("enableInstantShellConstruction", false);
             this.warnPlayerInsteadOfKilling = builder.comment("Warn player instead of killing them on sync failure").define("warnPlayerInsteadOfKilling", false);
+            this.mustMaintainOriginalBody = builder.comment("If the original body must be remain alive to allow syncing").define("mustMaintainOriginalBody", false);
             this.fingerstickDamage = builder.comment("Damage dealt by fingerstick (0-100)").defineInRange("fingerstickDamage", 20.0, 0.0, 100.0);
             this.hardcoreFingerstickDamage = builder.comment("Damage dealt by fingerstick in hardcore mode (0-100)")
                 .defineInRange("hardcoreFingerstickDamage", 40.0, 0.0, 100.0);
