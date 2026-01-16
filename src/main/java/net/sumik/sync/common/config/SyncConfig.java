@@ -21,6 +21,7 @@ public class SyncConfig {
     // General settings
     private static final ForgeConfigSpec.BooleanValue ENABLE_INSTANT_SHELL_CONSTRUCTION;
     private static final ForgeConfigSpec.BooleanValue WARN_PLAYER_INSTEAD_OF_KILLING;
+    private static final ForgeConfigSpec.BooleanValue MUST_MAINTAIN_ORIGINAL_BODY;
 
     // Damage settings
     private static final ForgeConfigSpec.DoubleValue FINGERSTICK_DAMAGE;
@@ -71,6 +72,10 @@ public class SyncConfig {
         WARN_PLAYER_INSTEAD_OF_KILLING = BUILDER
                 .comment("Warn player instead of killing them when they don't have enough health")
                 .define("warnPlayerInsteadOfKilling", false);
+
+        MUST_MAINTAIN_ORIGINAL_BODY = BUILDER
+                .comment("If the original body must be remain alive to allow syncing")
+                .define("mustMaintainOriginalBody", false);
 
         BUILDER.pop();
 
@@ -237,6 +242,10 @@ public class SyncConfig {
 
     public boolean warnPlayerInsteadOfKilling() {
         return WARN_PLAYER_INSTEAD_OF_KILLING.get();
+    }
+
+    public boolean mustMaintainOriginalBody() {
+        return MUST_MAINTAIN_ORIGINAL_BODY.get();
     }
 
     public float fingerstickDamage() {

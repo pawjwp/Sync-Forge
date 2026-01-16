@@ -31,6 +31,7 @@ import net.sumik.sync.api.networking.PlayerIsAlivePacket;
 import net.sumik.sync.api.networking.ShellStateUpdatePacket;
 import net.sumik.sync.api.networking.ShellUpdatePacket;
 import net.sumik.sync.api.shell.*;
+import net.sumik.sync.common.config.SyncConfig;
 import net.sumik.sync.common.entity.KillableEntity;
 import net.sumik.sync.common.utils.BlockPosUtil;
 import net.sumik.sync.common.utils.WorldUtil;
@@ -280,7 +281,9 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     private void onDeath(DamageSource source, CallbackInfo ci) {
-        if (!this.isArtificial) {
+        SyncConfig config = SyncConfig.getInstance();
+
+        if (!this.isArtificial && config.mustMaintainOriginalBody()) {
             return;
         }
 
