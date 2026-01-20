@@ -105,9 +105,9 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
         if (this.runner instanceof LivingEntity livingEntity) {
             livingEntity.walkDist = 1.5F + 2F * this.runningTime / MAX_RUNNING_TIME;
             // Debug print
-            if (this.runningTime % 20 == 0) {
+            /* if (this.runningTime % 20 == 0) {
                 System.out.println("Walk dist: " + livingEntity.walkDist + ", Running time: " + this.runningTime);
-            }
+            }*/
         }
         this.runningTime = Math.min(++this.runningTime, MAX_RUNNING_TIME);
     }
