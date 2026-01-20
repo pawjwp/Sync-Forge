@@ -36,3 +36,4 @@ runs/
 
 # forge generated resources cache
 /src/generated/resources/.cache/
+/reference
