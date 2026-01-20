@@ -16,6 +16,7 @@ import net.sumik.sync.common.block.SyncBlocks;
 import net.sumik.sync.common.block.entity.SyncBlockEntities;
 import net.sumik.sync.common.command.SyncCommands;
 import net.sumik.sync.common.compat.curios.CuriosCompat;
+import net.sumik.sync.common.compat.diet.DietCompat;
 import net.sumik.sync.common.compat.thirst.ThirstCompat;
 import net.sumik.sync.common.config.SyncConfig;
 import net.sumik.sync.common.item.SyncCreativeTabs;
@@ -41,6 +42,7 @@ public class Sync {
 
         // Initialize optional mod compatibility
         CuriosCompat.init();
+        DietCompat.init();
         ThirstCompat.init();
 
         if (FMLEnvironment.dist == Dist.CLIENT) {

@@ -81,6 +81,8 @@ dependencies {
     modRuntimeOnly("curse.maven:thirst-was-taken-679270:6660408")
     modRuntimeOnly("curse.maven:curios-309927:6418456")
     modRuntimeOnly("curse.maven:terra-curio-1027625:6566491")
+    modRuntimeOnly("curse.maven:diet-443570:4813904")
+    modRuntimeOnly("curse.maven:spectrelib-993948:5217603")
 
     // Mixin Extras
     implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${project.mixinextras_version}"))
