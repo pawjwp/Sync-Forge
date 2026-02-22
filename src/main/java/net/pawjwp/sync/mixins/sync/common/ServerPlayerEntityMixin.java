@@ -182,6 +182,7 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         this.removeAllEffects();
 
         new PlayerIsAlivePacket(serverPlayer).sendToAll(server);
+        state.getComponent().applyTo(serverPlayer);
         this.teleport(targetWorld, state.getPos());
         this.isArtificial = state.isArtificial();
 
@@ -189,9 +190,6 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         int selectedSlot = inventory.selected;
         state.getInventory().copyTo(inventory);
         inventory.selected = selectedSlot;
-
-        ShellStateComponent playerComponent = ShellStateComponent.of(serverPlayer);
-        playerComponent.clone(state.getComponent());
 
         serverPlayer.setGameMode(GameType.byId(state.getGameMode()));
         this.setHealth(state.getHealth());
@@ -324,7 +322,7 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
             this.undead = false;
         }
 
-        if (this.deathTime == 20) {
+        if (this.deathTime == 20 && this.shellsById.values().stream().noneMatch(x -> this.canBeApplied(x) && x.getProgress() >= ShellState.PROGRESS_DONE)) {
             this.level().broadcastEntityEvent(this, (byte)60);
             this.remove(RemovalReason.KILLED);
         }

@@ -43,18 +43,16 @@ public class DietShellStateComponent extends ShellStateComponent {
     }
 
     private void loadFromPlayer(ServerPlayer player) {
-        var trackerObj = player.getCapability(DIET_TRACKER_CAPABILITY).orElseThrow(
-            () -> new IllegalStateException("Player missing Diet capability")
-        );
-
-        try {
-            Method getValues = trackerObj.getClass().getMethod("getValues");
-            @SuppressWarnings("unchecked")
-            Map<String, Float> values = (Map<String, Float>) getValues.invoke(trackerObj);
-            this.dietValues = new HashMap<>(values);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load diet data from player", e);
-        }
+        player.getCapability(DIET_TRACKER_CAPABILITY).ifPresent(trackerObj -> {
+            try {
+                Method getValues = trackerObj.getClass().getMethod("getValues");
+                @SuppressWarnings("unchecked")
+                Map<String, Float> values = (Map<String, Float>) getValues.invoke(trackerObj);
+                this.dietValues = new HashMap<>(values);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to load diet data from player", e);
+            }
+        });
     }
 
     private void applyToPlayer(ServerPlayer player) {
@@ -78,6 +76,11 @@ public class DietShellStateComponent extends ShellStateComponent {
         } catch (Exception e) {
             throw new RuntimeException("Failed to apply diet data to player", e);
         }
+    }
+
+    @Override
+    public void applyTo(ServerPlayer player) {
+        applyToPlayer(player);
     }
 
     @Override

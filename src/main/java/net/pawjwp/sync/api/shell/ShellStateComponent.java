@@ -41,6 +41,12 @@ public abstract class ShellStateComponent {
     public abstract void clone(ShellStateComponent component);
 
     /**
+     * Applies the state of this component to the given player.
+     * @param player The player.
+     */
+    public void applyTo(ServerPlayer player) { }
+
+    /**
      * Restores state of the component from the nbt data.
      * @param nbt The nbt data.
      */
@@ -223,6 +229,13 @@ public abstract class ShellStateComponent {
         public void clone(ShellStateComponent component) {
             for (ShellStateComponent innerComponent : this.components) {
                 innerComponent.clone(component);
+            }
+        }
+
+        @Override
+        public void applyTo(ServerPlayer player) {
+            for (ShellStateComponent innerComponent : this.components) {
+                innerComponent.applyTo(player);
             }
         }
 

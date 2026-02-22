@@ -73,6 +73,11 @@ public class CuriosShellStateComponent extends ShellStateComponent {
     }
 
     @Override
+    public void applyTo(ServerPlayer player) {
+        applyToPlayer(player);
+    }
+
+    @Override
     public void clone(ShellStateComponent component) {
         CuriosShellStateComponent other = component.as(CuriosShellStateComponent.class);
         this.curiosData = other.curiosData.copy();
