@@ -56,26 +56,24 @@ public class DietShellStateComponent extends ShellStateComponent {
     }
 
     private void applyToPlayer(ServerPlayer player) {
-        var trackerObj = player.getCapability(DIET_TRACKER_CAPABILITY).orElseThrow(
-            () -> new IllegalStateException("Player missing Diet capability")
-        );
+        player.getCapability(DIET_TRACKER_CAPABILITY).ifPresent(trackerObj -> {
+            try {
+                if (this.dietValues.isEmpty()) {
+                    // Reset to config defaults by reinitializing the suite
+                    Method initSuite = trackerObj.getClass().getMethod("initSuite");
+                    initSuite.invoke(trackerObj);
+                } else {
+                    // Apply stored values
+                    Method setValues = trackerObj.getClass().getMethod("setValues", Map.class);
+                    setValues.invoke(trackerObj, this.dietValues);
+                }
 
-        try {
-            if (this.dietValues.isEmpty()) {
-                // Reset to config defaults by reinitializing the suite
-                Method initSuite = trackerObj.getClass().getMethod("initSuite");
-                initSuite.invoke(trackerObj);
-            } else {
-                // Apply stored values
-                Method setValues = trackerObj.getClass().getMethod("setValues", Map.class);
-                setValues.invoke(trackerObj, this.dietValues);
+                Method sync = trackerObj.getClass().getMethod("sync");
+                sync.invoke(trackerObj);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to apply diet data to player", e);
             }
-
-            Method sync = trackerObj.getClass().getMethod("sync");
-            sync.invoke(trackerObj);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to apply diet data to player", e);
-        }
+        });
     }
 
     @Override

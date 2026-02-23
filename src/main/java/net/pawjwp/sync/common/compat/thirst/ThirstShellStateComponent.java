@@ -43,43 +43,42 @@ public class ThirstShellStateComponent extends ShellStateComponent {
     }
 
     private void loadFromPlayer(ServerPlayer player) {
-        var thirstObj = player.getCapability(PLAYER_THIRST_CAPABILITY).orElseThrow(
-            () -> new IllegalStateException("Player missing Thirst capability")
-        );
+        player.getCapability(PLAYER_THIRST_CAPABILITY).ifPresent(thirstObj -> {
+            try {
+                Method getThirst = thirstObj.getClass().getMethod("getThirst");
+                Method getQuenched = thirstObj.getClass().getMethod("getQuenched");
+                Method getExhaustion = thirstObj.getClass().getMethod("getExhaustion");
 
-        try {
-            Method getThirst = thirstObj.getClass().getMethod("getThirst");
-            Method getQuenched = thirstObj.getClass().getMethod("getQuenched");
-            Method getExhaustion = thirstObj.getClass().getMethod("getExhaustion");
-
-            this.thirstLevel = (Integer) getThirst.invoke(thirstObj);
-            this.quenchedLevel = (Integer) getQuenched.invoke(thirstObj);
-            this.thirstExhaustion = (Float) getExhaustion.invoke(thirstObj);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load thirst data from player", e);
-        }
+                this.thirstLevel = (Integer) getThirst.invoke(thirstObj);
+                this.quenchedLevel = (Integer) getQuenched.invoke(thirstObj);
+                this.thirstExhaustion = (Float) getExhaustion.invoke(thirstObj);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to load thirst data from player", e);
+            }
+        });
     }
 
     private void applyToPlayer(ServerPlayer player) {
-        var thirstObj = player.getCapability(PLAYER_THIRST_CAPABILITY).orElseThrow(
-            () -> new IllegalStateException("Player missing Thirst capability")
-        );
+        player.getCapability(PLAYER_THIRST_CAPABILITY).ifPresent(thirstObj -> {
+            try {
+                Method setThirst = thirstObj.getClass().getMethod("setThirst", int.class);
+                Method setQuenched = thirstObj.getClass().getMethod("setQuenched", int.class);
+                Method setExhaustion = thirstObj.getClass().getMethod("setExhaustion", float.class);
+                Method updateThirstData = thirstObj.getClass().getMethod("updateThirstData", net.minecraft.world.entity.player.Player.class);
 
-        try {
-            Method setThirst = thirstObj.getClass().getMethod("setThirst", int.class);
-            Method setQuenched = thirstObj.getClass().getMethod("setQuenched", int.class);
-            Method setExhaustion = thirstObj.getClass().getMethod("setExhaustion", float.class);
-            Method updateThirstData = thirstObj.getClass().getMethod("updateThirstData", net.minecraft.world.entity.player.Player.class);
+                setThirst.invoke(thirstObj, this.thirstLevel);
+                setQuenched.invoke(thirstObj, this.quenchedLevel);
+                setExhaustion.invoke(thirstObj, this.thirstExhaustion);
+                updateThirstData.invoke(thirstObj, player);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to apply thirst data to player", e);
+            }
+        });
+    }
 
-            setThirst.invoke(thirstObj, this.thirstLevel);
-            setQuenched.invoke(thirstObj, this.quenchedLevel);
-            setExhaustion.invoke(thirstObj, this.thirstExhaustion);
-            updateThirstData.invoke(thirstObj, player);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to apply thirst data to player", e);
-        }
-
-
+    @Override
+    public void applyTo(ServerPlayer player) {
+        applyToPlayer(player);
     }
 
     @Override

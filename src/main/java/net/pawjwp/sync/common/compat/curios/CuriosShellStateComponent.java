@@ -42,34 +42,30 @@ public class CuriosShellStateComponent extends ShellStateComponent {
     }
 
     private void loadFromPlayer(ServerPlayer player) {
-        var curiosHandler = player.getCapability(CURIOS_INVENTORY_CAPABILITY).orElseThrow(
-            () -> new IllegalStateException("Player missing Curios capability")
-        );
-
-        try {
-            Method saveInventory = curiosHandler.getClass().getMethod("saveInventory", boolean.class);
-            this.curiosData = (ListTag) saveInventory.invoke(curiosHandler, false);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load curios data from player", e);
-        }
+        player.getCapability(CURIOS_INVENTORY_CAPABILITY).ifPresent(curiosHandler -> {
+            try {
+                Method saveInventory = curiosHandler.getClass().getMethod("saveInventory", boolean.class);
+                this.curiosData = (ListTag) saveInventory.invoke(curiosHandler, false);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to load curios data from player", e);
+            }
+        });
     }
 
     private void applyToPlayer(ServerPlayer player) {
-        var curiosHandler = player.getCapability(CURIOS_INVENTORY_CAPABILITY).orElseThrow(
-            () -> new IllegalStateException("Player missing Curios capability")
-        );
+        player.getCapability(CURIOS_INVENTORY_CAPABILITY).ifPresent(curiosHandler -> {
+            try {
+                // First, clear the current curios inventory
+                Method saveInventory = curiosHandler.getClass().getMethod("saveInventory", boolean.class);
+                saveInventory.invoke(curiosHandler, true); // true = clear while saving
 
-        try {
-            // First, clear the current curios inventory
-            Method saveInventory = curiosHandler.getClass().getMethod("saveInventory", boolean.class);
-            saveInventory.invoke(curiosHandler, true); // true = clear while saving
-
-            // Then load the new inventory data (even if empty)
-            Method loadInventory = curiosHandler.getClass().getMethod("loadInventory", ListTag.class);
-            loadInventory.invoke(curiosHandler, this.curiosData);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to apply curios data to player", e);
-        }
+                // Then load the new inventory data (even if empty)
+                Method loadInventory = curiosHandler.getClass().getMethod("loadInventory", ListTag.class);
+                loadInventory.invoke(curiosHandler, this.curiosData);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to apply curios data to player", e);
+            }
+        });
     }
 
     @Override
