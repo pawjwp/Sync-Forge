@@ -223,12 +223,11 @@ public class ShellState {
         shell.ownerName = player.getName().getString();
         shell.gameMode = player.gameMode.getGameModeForPlayer().getId();
         shell.inventory = new SimpleInventory();
-        shell.component = ShellStateComponent.empty();
 
         if (copyPlayerState) {
             shell.health = player.getHealth();
             shell.inventory.clone(player.getInventory());
-            shell.component.clone(ShellStateComponent.of(player));
+            shell.component = ShellStateComponent.of(player);
 
             shell.foodLevel = player.getFoodData().getFoodLevel();
             shell.saturationLevel = player.getFoodData().getSaturationLevel();
@@ -238,6 +237,7 @@ public class ShellState {
             shell.experienceProgress = player.experienceProgress;
             shell.totalExperience = player.totalExperience;
         } else {
+            shell.component = ShellStateComponent.empty();
             shell.health = player.getMaxHealth();
             shell.foodLevel = 20;
             shell.saturationLevel = 5;
@@ -250,10 +250,6 @@ public class ShellState {
     }
 
 
-    public void dropInventory(ServerLevel world) {
-        this.dropInventory(world, this.pos);
-    }
-
     public void dropInventory(ServerLevel world, BlockPos pos) {
         Stream
                 .of(this.inventory.main, this.inventory.armor, this.inventory.offHand, this.component.getItems())
@@ -261,18 +257,10 @@ public class ShellState {
                 .forEach(x -> this.dropItemStack(world, pos, x));
     }
 
-    public void dropXp(ServerLevel world) {
-        this.dropXp(world, this.pos);
-    }
-
     public void dropXp(ServerLevel world, BlockPos pos) {
         int xp = Math.min(this.experienceLevel * 7, 100) + this.component.getXp();
         Vec3 vecPos = new Vec3(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
         ExperienceOrb.award(world, vecPos, xp);
-    }
-
-    public void drop(ServerLevel world) {
-        this.drop(world, this.pos);
     }
 
     public void drop(ServerLevel world, BlockPos pos) {

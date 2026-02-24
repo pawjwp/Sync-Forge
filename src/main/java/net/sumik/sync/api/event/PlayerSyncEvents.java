@@ -2,8 +2,12 @@ package net.sumik.sync.api.event;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.sumik.sync.common.config.SyncConfig;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.sumik.sync.api.shell.ShellState;
@@ -272,6 +276,27 @@ public final class PlayerSyncEvents {
         ShellConstructionFailureReason OTHER_PROBLEM = () -> null;
         ShellConstructionFailureReason OCCUPIED = create(Component.translatable("event.sync.construction.fail.occupied"));
         ShellConstructionFailureReason NOT_ENOUGH_HEALTH = create(Component.translatable("event.sync.construction.fail.health"));
+        ShellConstructionFailureReason MISSING_REQUIRED_ITEM = new ShellConstructionFailureReason() {
+            @Override
+            public Component toText() {
+                SyncConfig config = SyncConfig.getInstance();
+                String itemName = config.shellConstructionRequiredItem();
+                if (itemName != null && !itemName.isEmpty()) {
+                    ResourceLocation itemId = ResourceLocation.tryParse(itemName);
+                    if (itemId == null) {
+                        return Component.translatable("event.sync.construction.fail.missing_item.generic");
+                    }
+                    Item item = ForgeRegistries.ITEMS.getValue(itemId);
+                    if (item == null) {
+                        return Component.translatable("event.sync.construction.fail.missing_item.generic");
+                    }
+                    int count = config.shellConstructionItemCount();
+                    String message = config.missingItemMessage();
+                    return Component.literal(String.format(message, item.getDescription().getString(), count));
+                }
+                return Component.translatable("event.sync.construction.fail.missing_item.generic");
+            }
+        };
 
         @Nullable
         Component toText();

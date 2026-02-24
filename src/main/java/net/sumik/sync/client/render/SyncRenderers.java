@@ -66,8 +66,12 @@ public final class SyncRenderers {
 
         @Override
         public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-            if (renderEntity == null) {
-                renderEntity = blockEntityType.create(BlockPos.ZERO, block.defaultBlockState());
+            if (renderEntity == null && net.minecraft.client.Minecraft.getInstance().level != null) {
+                try {
+                    renderEntity = blockEntityType.create(BlockPos.ZERO, block.defaultBlockState());
+                } catch (Exception e) {
+                    return;
+                }
             }
 
             if (renderEntity != null) {

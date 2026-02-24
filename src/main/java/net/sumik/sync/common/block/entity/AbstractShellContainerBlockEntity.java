@@ -202,7 +202,7 @@ public abstract class AbstractShellContainerBlockEntity extends BlockEntity impl
     protected void destroyShell(ServerLevel world, BlockPos pos) {
         if (this.shell != null) {
             this.shell.drop(world, pos);
-            new ShellDestroyedPacket(pos).send(world, pos, 32);
+            new ShellDestroyedPacket(pos).send(world, pos, 32.0);
             this.shell = null;
         }
     }

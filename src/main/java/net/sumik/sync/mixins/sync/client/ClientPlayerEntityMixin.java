@@ -15,6 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sumik.sync.api.event.PlayerSyncEvents;
 import net.sumik.sync.api.networking.SynchronizationRequestPacket;
 import net.sumik.sync.api.shell.ClientShell;
+import net.sumik.sync.common.config.SyncConfig;
 import net.sumik.sync.api.shell.ShellPriority;
 import net.sumik.sync.api.shell.ShellState;
 import net.sumik.sync.client.gui.controller.DeathScreenController;
@@ -80,12 +81,27 @@ public abstract class  ClientPlayerEntityMixin extends AbstractClientPlayer impl
         BlockPos pos = this.blockPosition();
         Direction facing = BlockPosUtil.getHorizontalFacing(pos, world).orElse(this.getDirection().getOpposite());
         SynchronizationRequestPacket request = new SynchronizationRequestPacket(state);
+
+        if (!SyncConfig.getInstance().enableShellSwitchAnimation()) {
+            request.send();
+            HudController.hide();
+            if (this.isDeadOrDying()) {
+                DeathScreenController.suspend();
+            } else if (!this.sync$isArtificial) {
+                DeathScreenController.suspend();
+            }
+            this.minecraft.setScreen(null);
+            return null;
+        }
+
         PersistentCameraEntityGoal cameraGoal = this.isDeadOrDying()
                 ? PersistentCameraEntityGoal.limbo(pos, facing, state.getPos(), __ -> request.send())
                 : PersistentCameraEntityGoal.stairwayToHeaven(pos, facing, state.getPos(), __ -> request.send());
 
         HudController.hide();
         if (this.isDeadOrDying()) {
+            DeathScreenController.suspend();
+        } else if (!this.sync$isArtificial) {
             DeathScreenController.suspend();
         }
         this.minecraft.setScreen(null);
@@ -123,7 +139,7 @@ public abstract class  ClientPlayerEntityMixin extends AbstractClientPlayer impl
             }
         };
 
-        boolean enableCamera = Objects.equals(startWorld, targetWorld);
+        boolean enableCamera = Objects.equals(startWorld, targetWorld) && SyncConfig.getInstance().enableShellSwitchAnimation();
         if (enableCamera) {
             PersistentCameraEntityGoal cameraGoal = PersistentCameraEntityGoal.highwayToHell(startPos, startFacing, targetPos, targetFacing, __ -> restore.run());
             PersistentCameraEntity.setup(this.minecraft, cameraGoal);
@@ -166,7 +182,6 @@ public abstract class  ClientPlayerEntityMixin extends AbstractClientPlayer impl
     public void add(ShellState state) {
         if (this.canBeApplied(state)) {
             this.sync$shellsById.put(state.getUuid(), state);
-            System.out.println("Added shell: " + state.getUuid() + ", total: " + this.sync$shellsById.size());
         }
     }
 
@@ -201,7 +216,15 @@ public abstract class  ClientPlayerEntityMixin extends AbstractClientPlayer impl
                 .min(comparator)
                 .orElse(null) : null;
         if (respawnShell != null) {
-            this.beginSync(respawnShell);
+            if (!SyncConfig.getInstance().enableDeathRespawnAnimation()) {
+                SynchronizationRequestPacket request = new SynchronizationRequestPacket(respawnShell);
+                request.send();
+                HudController.hide();
+                DeathScreenController.suspend();
+                this.minecraft.setScreen(null);
+            } else {
+                this.beginSync(respawnShell);
+            }
         }
     }
 

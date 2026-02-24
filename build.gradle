@@ -70,6 +70,9 @@ dependencies {
         it.officialMojangMappings { nameSyntheticMembers = false }
 
     }
+    // Optional mod compatibility
+    modCompileOnly("curse.maven:curios-309927:6418456")
+
     // Performance Mods
     modRuntimeOnly("curse.maven:embeddium-908741:5681725")
     modRuntimeOnly("curse.maven:ferritecore-429235:4810975")

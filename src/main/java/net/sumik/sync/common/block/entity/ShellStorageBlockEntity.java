@@ -84,7 +84,7 @@ public class ShellStorageBlockEntity extends AbstractShellContainerBlockEntity i
         }
 
         if (!infinitePower && !isReceivingRedstonePower && hasEnergy) {
-            this.storedEnergy = (int) Mth.clamp(this.storedEnergy - config.shellStorageConsumption(), 0, config.shellStorageCapacity());
+            this.storedEnergy = (int) Mth.clamp((float)(this.storedEnergy - config.shellStorageConsumption()), 0.0F, (float)config.shellStorageCapacity());
         }
     }
 

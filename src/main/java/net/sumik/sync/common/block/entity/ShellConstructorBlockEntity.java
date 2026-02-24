@@ -2,10 +2,13 @@ package net.sumik.sync.common.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,6 +16,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.sumik.sync.Sync;
 import net.sumik.sync.api.event.PlayerSyncEvents;
 import net.sumik.sync.api.shell.ShellState;
 import net.sumik.sync.api.shell.ShellStateContainer;
@@ -39,6 +44,7 @@ public class ShellConstructorBlockEntity extends AbstractShellContainerBlockEnti
         }
     }
 
+    @Override
     public InteractionResult onUse(Level world, BlockPos pos, Player player, InteractionHand hand) {
         PlayerSyncEvents.ShellConstructionFailureReason failureReason = this.beginShellConstruction(player);
         if (failureReason == null) {
@@ -57,6 +63,10 @@ public class ShellConstructorBlockEntity extends AbstractShellContainerBlockEnti
 
         if (failureReason != null) {
             return failureReason;
+        }
+
+        if (!this.checkAndConsumeRequiredItem(player)) {
+            return PlayerSyncEvents.ShellConstructionFailureReason.MISSING_REQUIRED_ITEM;
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
@@ -82,6 +92,63 @@ public class ShellConstructorBlockEntity extends AbstractShellContainerBlockEnti
         return null;
     }
 
+    private boolean checkAndConsumeRequiredItem(Player player) {
+        SyncConfig config = SyncConfig.getInstance();
+        String requiredItemName = config.shellConstructionRequiredItem();
+        if (requiredItemName == null || requiredItemName.isEmpty()) {
+            return true;
+        }
+
+        ResourceLocation itemId = ResourceLocation.tryParse(requiredItemName);
+        if (itemId == null) {
+            Sync.LOGGER.warn("Invalid item format in config: " + requiredItemName);
+            return true;
+        }
+
+        Item requiredItem = ForgeRegistries.ITEMS.getValue(itemId);
+        if (requiredItem == null) {
+            Sync.LOGGER.warn("Invalid item configured for shell construction: " + requiredItemName);
+            return true;
+        }
+
+        boolean isCreative = player.isCreative();
+        if (isCreative && !config.consumeItemInCreative()) {
+            return player.getInventory().contains(new ItemStack(requiredItem));
+        }
+
+        int requiredCount = config.shellConstructionItemCount();
+        int foundCount = 0;
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() == requiredItem) {
+                foundCount += stack.getCount();
+                if (foundCount >= requiredCount) {
+                    break;
+                }
+            }
+        }
+
+        if (foundCount < requiredCount) {
+            return false;
+        }
+
+        if (!isCreative || config.consumeItemInCreative()) {
+            int toRemove = requiredCount;
+            for (int i = 0; i < player.getInventory().items.size(); i++) {
+                ItemStack stack = player.getInventory().items.get(i);
+                if (stack.getItem() == requiredItem) {
+                    int removeFromStack = Math.min(toRemove, stack.getCount());
+                    stack.shrink(removeFromStack);
+                    toRemove -= removeFromStack;
+                    if (toRemove <= 0) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         ShellConstructorBlockEntity bottom = (ShellConstructorBlockEntity) this.getBottomPart().orElse(null);
@@ -96,7 +163,6 @@ public class ShellConstructorBlockEntity extends AbstractShellContainerBlockEnti
         if (accepted > 0 && !simulate) {
             bottom.shell.setProgress(bottom.shell.getProgress() + (float) accepted / capacity);
             bottom.setChanged();
-            bottom.sync();
         }
 
         return accepted;

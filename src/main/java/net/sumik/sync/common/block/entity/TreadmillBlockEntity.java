@@ -58,11 +58,12 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
 
         if (this.runner != null) {
             if (this.runner instanceof LivingEntity livingEntity) {
-                livingEntity.setSpeed(0);
+                livingEntity.setSpeed(0.0F);
                 livingEntity.setDeltaMovement(Vec3.ZERO);
+                livingEntity.walkAnimation.setSpeed(0.0F);
                 if (livingEntity instanceof Mob mob) {
-                    mob.xxa = 0;
-                    mob.zza = 0;
+                    mob.xxa = 0.0F;
+                    mob.zza = 0.0F;
                 }
             }
 
@@ -79,15 +80,11 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
             EntityFitnessEvents.START_RUNNING.invoker().onStartRunning(this.runner, this);
         }
 
-        if (this.level == null) {
-            return;
-        }
-
-        if (this.level.isClientSide) {
-            // TODO: TechnobladeManager.refreshTechnobladeStatus(entity, this.worldPosition);
-        } else {
-            this.setChanged();
-            this.sync();
+        if (this.level != null) {
+            if (!this.level.isClientSide) {
+                this.setChanged();
+                this.sync();
+            }
         }
     }
 
@@ -98,18 +95,23 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
             this.runnerId = null;
         }
 
-        if (this.runner == null) {
-            return;
-        }
-
-        if (this.runner instanceof LivingEntity livingEntity) {
-            livingEntity.walkDist = 1.5F + 2F * this.runningTime / MAX_RUNNING_TIME;
-            // Debug print
-            if (this.runningTime % 20 == 0) {
-                System.out.println("Walk dist: " + livingEntity.walkDist + ", Running time: " + this.runningTime);
+        if (this.runner != null) {
+            Direction face = state.getValue(TreadmillBlock.FACING);
+            Vec3 anchor = computeTreadmillPivot(pos, face);
+            if (isValidEntity(this.runner) && isEntityNear(this.runner, anchor)) {
+                if (this.runner instanceof LivingEntity livingEntity) {
+                    float progress = this.runningTime / (float) MAX_RUNNING_TIME;
+                    float animationSpeed = 1.5F + 2.0F * progress;
+                    livingEntity.walkAnimation.setSpeed(animationSpeed);
+                }
+                this.runningTime = Math.min(++this.runningTime, MAX_RUNNING_TIME);
+            } else {
+                if (this.runner instanceof LivingEntity livingEntity) {
+                    livingEntity.walkAnimation.setSpeed(0.0F);
+                }
+                this.setRunner(null);
             }
         }
-        this.runningTime = Math.min(++this.runningTime, MAX_RUNNING_TIME);
     }
 
     @Override
@@ -137,27 +139,6 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
             this.runner.setYBodyRot(yaw);
             this.runner.setYRot(yaw);
             this.runner.yRotO = yaw;
-        }
-
-        if (this.runner instanceof LivingEntity livingEntity) {
-            livingEntity.setSpeed(0.15F);
-
-            Vec3 motion = new Vec3(
-                    face.getStepX() * -0.08,
-                    0,
-                    face.getStepZ() * -0.08
-            );
-            livingEntity.setDeltaMovement(motion);
-
-            livingEntity.walkDist = 1.5F + 20F * this.runningTime / MAX_RUNNING_TIME;
-
-            livingEntity.walkDistO = livingEntity.walkDist - 0.5F;
-
-            if (livingEntity instanceof Mob mob) {
-                mob.getNavigation().stop();
-                mob.xxa = 0;
-                mob.zza = 1;
-            }
         }
 
         if (this.runner instanceof LivingEntity livingEntity) {

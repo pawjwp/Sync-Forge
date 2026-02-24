@@ -3,380 +3,301 @@ package net.sumik.sync.common.config;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.Builder;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
+import net.minecraftforge.common.ForgeConfigSpec.EnumValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+import net.minecraftforge.common.ForgeConfigSpec.LongValue;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sumik.sync.Sync;
 import net.sumik.sync.api.shell.ShellPriority;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-@Mod.EventBusSubscriber(modid = Sync.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = "sync", bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SyncConfig {
-    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-    public static final ForgeConfigSpec SPEC;
-
-    // General settings
-    private static final ForgeConfigSpec.BooleanValue ENABLE_INSTANT_SHELL_CONSTRUCTION;
-    private static final ForgeConfigSpec.BooleanValue WARN_PLAYER_INSTEAD_OF_KILLING;
-
-    // Damage settings
-    private static final ForgeConfigSpec.DoubleValue FINGERSTICK_DAMAGE;
-    private static final ForgeConfigSpec.DoubleValue HARDCORE_FINGERSTICK_DAMAGE;
-
-    // Energy settings
-    private static final ForgeConfigSpec.LongValue SHELL_CONSTRUCTOR_CAPACITY;
-    private static final ForgeConfigSpec.LongValue SHELL_STORAGE_CAPACITY;
-    private static final ForgeConfigSpec.LongValue SHELL_STORAGE_CONSUMPTION;
-
-    // Shell storage settings
-    private static final ForgeConfigSpec.BooleanValue SHELL_STORAGE_ACCEPTS_REDSTONE;
-    private static final ForgeConfigSpec.IntValue SHELL_STORAGE_MAX_UNPOWERED_LIFESPAN;
-
-    // Energy map
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ENERGY_MAP;
-
-    // Sync priority
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> SYNC_PRIORITY;
-
-    // Tool settings
-    private static final ForgeConfigSpec.ConfigValue<String> WRENCH;
-
-    // Misc settings
-    private static final ForgeConfigSpec.BooleanValue UPDATE_TRANSLATIONS_AUTOMATICALLY;
-    private static final ForgeConfigSpec.BooleanValue PRESERVE_ORIGINS;
-
-    // Technoblade easter egg
-    private static final ForgeConfigSpec.BooleanValue ENABLE_TECHNOBLADE_EASTER_EGG;
-    private static final ForgeConfigSpec.BooleanValue RENDER_TECHNOBLADE_CAPE;
-    private static final ForgeConfigSpec.BooleanValue ALLOW_TECHNOBLADE_ANNOUNCEMENTS;
-    private static final ForgeConfigSpec.BooleanValue ALLOW_TECHNOBLADE_QUOTES;
-    private static final ForgeConfigSpec.IntValue TECHNOBLADE_QUOTE_DELAY;
-    private static final ForgeConfigSpec.ConfigValue<List<? extends String>> TECHNOBLADE_UUIDS;
-
-    // Cached values
-    private static List<EnergyMapEntry> cachedEnergyMap = null;
-    private static List<ShellPriorityEntry> cachedSyncPriority = null;
-    private static Set<UUID> cachedTechnobladeUuids = null;
-
-    static {
-        BUILDER.comment("General settings").push("general");
-
-        ENABLE_INSTANT_SHELL_CONSTRUCTION = BUILDER
-                .comment("Enable instant shell construction (creative mode)")
-                .define("enableInstantShellConstruction", false);
-
-        WARN_PLAYER_INSTEAD_OF_KILLING = BUILDER
-                .comment("Warn player instead of killing them when they don't have enough health")
-                .define("warnPlayerInsteadOfKilling", false);
-
-        BUILDER.pop();
-
-        BUILDER.comment("Damage settings").push("damage");
-
-        FINGERSTICK_DAMAGE = BUILDER
-                .comment("Damage dealt when creating a shell (in half hearts)")
-                .defineInRange("fingerstickDamage", 20.0, 0.0, 40.0);
-
-        HARDCORE_FINGERSTICK_DAMAGE = BUILDER
-                .comment("Damage dealt when creating a shell in hardcore mode")
-                .defineInRange("hardcoreFingerstickDamage", 40.0, 0.0, 80.0);
-
-        BUILDER.pop();
-
-        BUILDER.comment("Energy settings").push("energy");
-
-        SHELL_CONSTRUCTOR_CAPACITY = BUILDER
-                .comment("Energy capacity/requirement for shell constructor")
-                .defineInRange("shellConstructorCapacity", 256000L, 1000L, Long.MAX_VALUE);
-
-        SHELL_STORAGE_CAPACITY = BUILDER
-                .comment("Energy capacity of shell storage")
-                .defineInRange("shellStorageCapacity", 320L, 0L, Long.MAX_VALUE);
-
-        SHELL_STORAGE_CONSUMPTION = BUILDER
-                .comment("Energy consumption per tick for shell storage")
-                .defineInRange("shellStorageConsumption", 16L, 0L, 1000L);
-
-        BUILDER.pop();
-
-        BUILDER.comment("Shell Storage settings").push("shellStorage");
-
-        SHELL_STORAGE_ACCEPTS_REDSTONE = BUILDER
-                .comment("Whether shell storage accepts redstone power")
-                .define("acceptsRedstone", true);
-
-        SHELL_STORAGE_MAX_UNPOWERED_LIFESPAN = BUILDER
-                .comment("Maximum time (in ticks) shell storage can run without power")
-                .defineInRange("maxUnpoweredLifespan", 20, 0, 6000);
-
-        BUILDER.pop();
-
-        BUILDER.comment("Energy production settings").push("energyProduction");
-
-        ENERGY_MAP = BUILDER
-                .comment("Entity energy production map (format: 'entity_id:energy_per_tick')")
-                .defineList("energyMap",
-                        Arrays.asList(
-                                "minecraft:chicken:2",
-                                "minecraft:pig:16",
-                                "minecraft:player:20",
-                                "minecraft:villager:25",
-                                "minecraft:wolf:22",
-                                "minecraft:creeper:80",
-                                "minecraft:enderman:160"
-                        ),
-                        obj -> obj instanceof String && ((String)obj).contains(":")
-                );
-
-        BUILDER.pop();
-
-        BUILDER.comment("Synchronization settings").push("sync");
-
-        SYNC_PRIORITY = BUILDER
-                .comment("Shell priority order for automatic synchronization",
-                        "Valid values: WHITE, ORANGE, MAGENTA, LIGHT_BLUE, YELLOW, LIME, PINK, GRAY,",
-                        "LIGHT_GRAY, CYAN, PURPLE, BLUE, BROWN, GREEN, RED, BLACK, NEAREST, NATURAL")
-                .defineList("syncPriority",
-                        Collections.singletonList("NATURAL"),
-                        obj -> obj instanceof String && isValidPriority((String)obj)
-                );
-
-        PRESERVE_ORIGINS = BUILDER
-                .comment("If enabled, all shells share the same origins")
-                .define("preserveOrigins", false);
-
-        BUILDER.pop();
-
-        BUILDER.comment("Tool settings").push("tools");
-
-        WRENCH = BUILDER
-                .comment("Item ID to use as wrench")
-                .define("wrench", "minecraft:stick");
-
-        BUILDER.pop();
-
-        BUILDER.comment("Miscellaneous settings").push("misc");
-
-        UPDATE_TRANSLATIONS_AUTOMATICALLY = BUILDER
-                .comment("Update translations automatically on game launch")
-                .define("updateTranslationsAutomatically", false);
-
-        BUILDER.pop();
-
-        BUILDER.comment("Easter egg settings").push("easterEggs");
-
-        ENABLE_TECHNOBLADE_EASTER_EGG = BUILDER
-                .comment("Enable Technoblade easter egg")
-                .define("enableTechnobladeEasterEgg", true);
-
-        RENDER_TECHNOBLADE_CAPE = BUILDER
-                .comment("Render Technoblade's cape")
-                .define("renderTechnobladeCape", false);
-
-        ALLOW_TECHNOBLADE_ANNOUNCEMENTS = BUILDER
-                .comment("Allow Technoblade announcements")
-                .define("allowTechnobladeAnnouncements", true);
-
-        ALLOW_TECHNOBLADE_QUOTES = BUILDER
-                .comment("Allow Technoblade quotes")
-                .define("allowTechnobladeQuotes", true);
-
-        TECHNOBLADE_QUOTE_DELAY = BUILDER
-                .comment("Delay between Technoblade quotes (in ticks)")
-                .defineInRange("technobladeQuoteDelay", 1800, 200, 72000);
-
-        TECHNOBLADE_UUIDS = BUILDER
-                .comment("UUIDs of players to treat as Technoblade")
-                .defineList("technobladeUuids",
-                        Collections.emptyList(),
-                        obj -> obj instanceof String && isValidUuid((String)obj)
-                );
-
-        BUILDER.pop();
-
-        SPEC = BUILDER.build();
-    }
-
-    private static boolean isValidPriority(String priority) {
-        try {
-            ShellPriority.valueOf(priority.toUpperCase());
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    private static boolean isValidUuid(String uuid) {
-        try {
-            UUID.fromString(uuid);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    @SubscribeEvent
-    static void onLoad(final ModConfigEvent event) {
-        cachedEnergyMap = null;
-        cachedSyncPriority = null;
-        cachedTechnobladeUuids = null;
-    }
-
-    private static final SyncConfig INSTANCE = new SyncConfig();
+    public static final SyncConfig.CommonConfig COMMON;
+    public static final ForgeConfigSpec COMMON_SPEC;
+    private static SyncConfig INSTANCE = new SyncConfig();
+    private static Map<String, Long> energyMap = null;
+    private static Set<UUID> technobladeSet = null;
 
     public static SyncConfig getInstance() {
         return INSTANCE;
     }
 
+    @SubscribeEvent
+    static void onLoad(ModConfigEvent event) {
+        energyMap = null;
+        technobladeSet = null;
+    }
+
     public boolean enableInstantShellConstruction() {
-        return ENABLE_INSTANT_SHELL_CONSTRUCTION.get();
+        return COMMON.enableInstantShellConstruction.get();
     }
 
     public boolean warnPlayerInsteadOfKilling() {
-        return WARN_PLAYER_INSTEAD_OF_KILLING.get();
+        return COMMON.warnPlayerInsteadOfKilling.get();
     }
 
     public float fingerstickDamage() {
-        return FINGERSTICK_DAMAGE.get().floatValue();
+        return COMMON.fingerstickDamage.get().floatValue();
     }
 
     public float hardcoreFingerstickDamage() {
-        return HARDCORE_FINGERSTICK_DAMAGE.get().floatValue();
+        return COMMON.hardcoreFingerstickDamage.get().floatValue();
+    }
+
+    public String shellConstructionRequiredItem() {
+        return COMMON.shellConstructionRequiredItem.get();
+    }
+
+    public int shellConstructionItemCount() {
+        return COMMON.shellConstructionItemCount.get();
+    }
+
+    public boolean consumeItemInCreative() {
+        return COMMON.consumeItemInCreative.get();
+    }
+
+    public String missingItemMessage() {
+        return COMMON.missingItemMessage.get();
     }
 
     public long shellConstructorCapacity() {
-        return SHELL_CONSTRUCTOR_CAPACITY.get();
+        return COMMON.shellConstructorCapacity.get();
     }
 
     public long shellStorageCapacity() {
-        return SHELL_STORAGE_CAPACITY.get();
+        return COMMON.shellStorageCapacity.get();
     }
 
     public long shellStorageConsumption() {
-        return SHELL_STORAGE_CONSUMPTION.get();
+        return COMMON.shellStorageConsumption.get();
     }
 
     public boolean shellStorageAcceptsRedstone() {
-        return SHELL_STORAGE_ACCEPTS_REDSTONE.get();
+        return COMMON.shellStorageAcceptsRedstone.get();
     }
 
     public int shellStorageMaxUnpoweredLifespan() {
-        return SHELL_STORAGE_MAX_UNPOWERED_LIFESPAN.get();
+        return COMMON.shellStorageMaxUnpoweredLifespan.get();
     }
 
     public List<EnergyMapEntry> energyMap() {
-        if (cachedEnergyMap == null) {
-            cachedEnergyMap = ENERGY_MAP.get().stream()
-                    .map(str -> {
-                        String[] parts = str.split(":");
-                        if (parts.length >= 3) {
-                            String entityId = parts[0] + ":" + parts[1];
-                            try {
-                                long energy = Long.parseLong(parts[2]);
-                                return EnergyMapEntry.of(entityId, energy);
-                            } catch (NumberFormatException e) {
-                                // Invalid format
-                            }
-                        }
-                        return null;
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+        if (energyMap == null) {
+            energyMap = new HashMap<>();
+
+            for (String entry : COMMON.energyMapEntries.get()) {
+                String[] parts = entry.split("=");
+                if (parts.length == 2) {
+                    try {
+                        long energy = Long.parseLong(parts[1]);
+                        energyMap.put(parts[0], energy);
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
         }
-        return cachedEnergyMap;
+
+        List<EnergyMapEntry> entries = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : energyMap.entrySet()) {
+            entries.add(EnergyMapEntry.of(entry.getKey(), entry.getValue()));
+        }
+        return entries;
     }
 
     public List<ShellPriorityEntry> syncPriority() {
-        if (cachedSyncPriority == null) {
-            cachedSyncPriority = SYNC_PRIORITY.get().stream()
-                    .map(str -> {
-                        try {
-                            ShellPriority priority = ShellPriority.valueOf(str.toUpperCase());
-                            return new ShellPriorityEntry() {
-                                @Override
-                                public ShellPriority priority() {
-                                    return priority;
-                                }
-                            };
-                        } catch (IllegalArgumentException e) {
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
-        return cachedSyncPriority;
+        return List.of(new ShellPriorityEntry() {
+            @Override
+            public ShellPriority priority() {
+                return COMMON.syncPriority.get();
+            }
+        });
     }
 
     public String wrench() {
-        return WRENCH.get();
+        return COMMON.wrench.get();
     }
 
     public boolean updateTranslationsAutomatically() {
-        return UPDATE_TRANSLATIONS_AUTOMATICALLY.get();
+        return COMMON.updateTranslationsAutomatically.get();
     }
 
-    public boolean preserveOrigins() {
-        return PRESERVE_ORIGINS.get();
+    public boolean enableShellSwitchAnimation() {
+        return COMMON.enableShellSwitchAnimation.get();
+    }
+
+    public boolean enableDeathRespawnAnimation() {
+        return COMMON.enableDeathRespawnAnimation.get();
     }
 
     public boolean enableTechnobladeEasterEgg() {
-        return ENABLE_TECHNOBLADE_EASTER_EGG.get();
+        return COMMON.enableTechnobladeEasterEgg.get();
     }
 
     public boolean renderTechnobladeCape() {
-        return RENDER_TECHNOBLADE_CAPE.get();
+        return COMMON.renderTechnobladeCape.get();
     }
 
     public boolean allowTechnobladeAnnouncements() {
-        return ALLOW_TECHNOBLADE_ANNOUNCEMENTS.get();
+        return COMMON.allowTechnobladeAnnouncements.get();
     }
 
     public boolean allowTechnobladeQuotes() {
-        return ALLOW_TECHNOBLADE_QUOTES.get();
+        return COMMON.allowTechnobladeQuotes.get();
     }
 
     public int TechnobladeQuoteDelay() {
-        return TECHNOBLADE_QUOTE_DELAY.get();
+        return COMMON.technobladeQuoteDelay.get();
     }
 
     public boolean isTechnoblade(UUID uuid) {
-        if (cachedTechnobladeUuids == null) {
-            cachedTechnobladeUuids = TECHNOBLADE_UUIDS.get().stream()
-                    .map(str -> {
-                        try {
-                            return UUID.fromString(str);
-                        } catch (IllegalArgumentException e) {
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
+        if (technobladeSet == null) {
+            technobladeSet = new HashSet<>();
+
+            for (String uuidStr : COMMON.technobladeUuids.get()) {
+                try {
+                    technobladeSet.add(UUID.fromString(uuidStr));
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
         }
-        return cachedTechnobladeUuids.contains(uuid);
+
+        return technobladeSet.contains(uuid);
     }
 
     public void addTechnoblade(UUID uuid) {
-        List<String> current = new ArrayList<>(TECHNOBLADE_UUIDS.get());
-        current.add(uuid.toString());
-        TECHNOBLADE_UUIDS.set(current);
-        TECHNOBLADE_UUIDS.save();
-        cachedTechnobladeUuids = null;
+        List<String> current = new ArrayList<>(COMMON.technobladeUuids.get());
+        String uuidStr = uuid.toString();
+        if (!current.contains(uuidStr)) {
+            current.add(uuidStr);
+            COMMON.technobladeUuids.set(current);
+            technobladeSet = null;
+        }
     }
 
     public void removeTechnoblade(UUID uuid) {
-        List<String> current = new ArrayList<>(TECHNOBLADE_UUIDS.get());
-        current.remove(uuid.toString());
-        TECHNOBLADE_UUIDS.set(current);
-        TECHNOBLADE_UUIDS.save();
-        cachedTechnobladeUuids = null;
+        List<String> current = new ArrayList<>(COMMON.technobladeUuids.get());
+        if (current.remove(uuid.toString())) {
+            COMMON.technobladeUuids.set(current);
+            technobladeSet = null;
+        }
     }
 
     public void clearTechnobladeCache() {
-        cachedTechnobladeUuids = null;
+        COMMON.technobladeUuids.set(new ArrayList<>());
+        technobladeSet = null;
+    }
+
+    static {
+        Pair<CommonConfig, ForgeConfigSpec> specPair = new Builder().configure(CommonConfig::new);
+        COMMON_SPEC = specPair.getRight();
+        COMMON = specPair.getLeft();
+    }
+
+    public static class CommonConfig {
+        public final BooleanValue enableInstantShellConstruction;
+        public final BooleanValue warnPlayerInsteadOfKilling;
+        public final DoubleValue fingerstickDamage;
+        public final DoubleValue hardcoreFingerstickDamage;
+        public final ConfigValue<String> shellConstructionRequiredItem;
+        public final IntValue shellConstructionItemCount;
+        public final BooleanValue consumeItemInCreative;
+        public final ConfigValue<String> missingItemMessage;
+        public final LongValue shellConstructorCapacity;
+        public final LongValue shellStorageCapacity;
+        public final LongValue shellStorageConsumption;
+        public final BooleanValue shellStorageAcceptsRedstone;
+        public final IntValue shellStorageMaxUnpoweredLifespan;
+        public final ConfigValue<List<? extends String>> energyMapEntries;
+        public final EnumValue<ShellPriority> syncPriority;
+        public final ConfigValue<String> wrench;
+        public final BooleanValue updateTranslationsAutomatically;
+        public final BooleanValue enableTechnobladeEasterEgg;
+        public final BooleanValue renderTechnobladeCape;
+        public final BooleanValue allowTechnobladeAnnouncements;
+        public final BooleanValue allowTechnobladeQuotes;
+        public final IntValue technobladeQuoteDelay;
+        public final ConfigValue<List<? extends String>> technobladeUuids;
+        public final BooleanValue enableShellSwitchAnimation;
+        public final BooleanValue enableDeathRespawnAnimation;
+
+        public CommonConfig(Builder builder) {
+            builder.comment("Sync Configuration").push("general");
+            builder.comment("Shell Construction Settings").push("construction");
+            this.enableInstantShellConstruction = builder.comment("Enable instant shell construction (creative mode-like)")
+                .define("enableInstantShellConstruction", false);
+            this.warnPlayerInsteadOfKilling = builder.comment("Warn player instead of killing them on sync failure").define("warnPlayerInsteadOfKilling", false);
+            this.fingerstickDamage = builder.comment("Damage dealt by fingerstick (0-100)").defineInRange("fingerstickDamage", 20.0, 0.0, 100.0);
+            this.hardcoreFingerstickDamage = builder.comment("Damage dealt by fingerstick in hardcore mode (0-100)")
+                .defineInRange("hardcoreFingerstickDamage", 40.0, 0.0, 100.0);
+            this.shellConstructionRequiredItem = builder.comment(
+                    "Item required to construct a new shell (format: 'modid:itemname', e.g., 'minecraft:ender_pearl')",
+                    "Leave empty to disable item requirement"
+                )
+                .define("shellConstructionRequiredItem", "");
+            this.shellConstructionItemCount = builder.comment("Number of items consumed when constructing a shell")
+                .defineInRange("shellConstructionItemCount", 1, 1, 64);
+            this.consumeItemInCreative = builder.comment("Should the required item be consumed in creative mode?").define("consumeItemInCreative", false);
+            this.missingItemMessage = builder.comment("Custom error message when missing required item (use %s for item name, %d for count)")
+                .define("missingItemMessage", "You need %s x%d to construct a new shell!");
+            builder.pop();
+            builder.comment("Shell Storage Settings").push("storage");
+            this.shellConstructorCapacity = builder.comment("Energy capacity of shell constructor")
+                .defineInRange("shellConstructorCapacity", 256000L, 1000L, Long.MAX_VALUE);
+            this.shellStorageCapacity = builder.comment("Energy capacity of shell storage").defineInRange("shellStorageCapacity", 320L, 10L, Long.MAX_VALUE);
+            this.shellStorageConsumption = builder.comment("Energy consumption per tick for shell storage")
+                .defineInRange("shellStorageConsumption", 16L, 1L, 1000L);
+            this.shellStorageAcceptsRedstone = builder.comment("Whether shell storage accepts redstone power").define("shellStorageAcceptsRedstone", true);
+            this.shellStorageMaxUnpoweredLifespan = builder.comment("Maximum ticks shell storage can run without power")
+                .defineInRange("shellStorageMaxUnpoweredLifespan", 20, 0, 1200);
+            builder.pop();
+            builder.comment("Energy Generation").push("energy");
+            this.energyMapEntries = builder.comment("Entity energy output mapping (format: 'modid:entity=energyAmount')")
+                .defineList(
+                    "energyMap",
+                    Arrays.asList(
+                        "minecraft:chicken=2",
+                        "minecraft:pig=16",
+                        "minecraft:player=20",
+                        "minecraft:wolf=22",
+                        "minecraft:villager=25",
+                        "minecraft:creeper=80",
+                        "minecraft:enderman=160"
+                    ),
+                    obj -> obj instanceof String && ((String)obj).contains("=")
+                );
+            builder.pop();
+            builder.comment("Gameplay Settings").push("gameplay");
+            this.syncPriority = builder.comment("Priority for shell selection (NATURAL, NEAREST, or color names)")
+                .defineEnum("syncPriority", ShellPriority.NATURAL);
+            builder.pop();
+            builder.comment("Tools").push("tools");
+            this.wrench = builder.comment("Item to use as wrench (format: 'modid:item')").define("wrench", "minecraft:stick");
+            builder.pop();
+            builder.comment("Client Settings").push("client");
+            this.updateTranslationsAutomatically = builder.comment("Automatically update translations").define("updateTranslationsAutomatically", false);
+            this.enableShellSwitchAnimation = builder.comment("Enable camera animation when switching between shells").define("enableShellSwitchAnimation", true);
+            this.enableDeathRespawnAnimation = builder.comment("Enable camera animation when respawning into a shell after death")
+                .define("enableDeathRespawnAnimation", true);
+            builder.pop();
+            builder.comment("Easter Eggs").push("easter_eggs");
+            this.enableTechnobladeEasterEgg = builder.comment("Enable Technoblade easter egg").define("enableTechnobladeEasterEgg", true);
+            this.renderTechnobladeCape = builder.comment("Render Technoblade's cape").define("renderTechnobladeCape", false);
+            this.allowTechnobladeAnnouncements = builder.comment("Allow Technoblade announcements").define("allowTechnobladeAnnouncements", true);
+            this.allowTechnobladeQuotes = builder.comment("Allow Technoblade quotes").define("allowTechnobladeQuotes", true);
+            this.technobladeQuoteDelay = builder.comment("Delay between Technoblade quotes (in ticks)").defineInRange("technobladeQuoteDelay", 1800, 200, 72000);
+            this.technobladeUuids = builder.comment("UUIDs of players to treat as Technoblade")
+                .defineList("technobladeUuids", new ArrayList<>(), obj -> obj instanceof String);
+            builder.pop();
+            builder.pop();
+        }
     }
 
     public interface EnergyMapEntry {
@@ -385,7 +306,7 @@ public class SyncConfig {
         }
 
         default long outputEnergyQuantity() {
-            return 16;
+            return 16L;
         }
 
         default EntityType<?> getEntityType() {

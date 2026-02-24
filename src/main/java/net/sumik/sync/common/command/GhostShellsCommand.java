@@ -110,7 +110,7 @@ public class GhostShellsCommand implements Command {
     private static void updateShells(ServerPlayer player, boolean shouldRepair, boolean skipOnFailure,
                                      Consumer<Component> logger) {
         for (ShellState shellState : (Iterable<ShellState>)((Shell)player).getAvailableShellStates()::iterator) {
-            shellState.setProgress(100);
+            shellState.setProgress(100.0F);
             updateShell(player, shellState, shouldRepair, skipOnFailure, logger);
         }
     }

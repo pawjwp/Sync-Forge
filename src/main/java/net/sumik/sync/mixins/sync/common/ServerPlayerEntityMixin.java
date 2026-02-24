@@ -31,6 +31,7 @@ import net.sumik.sync.api.networking.PlayerIsAlivePacket;
 import net.sumik.sync.api.networking.ShellStateUpdatePacket;
 import net.sumik.sync.api.networking.ShellUpdatePacket;
 import net.sumik.sync.api.shell.*;
+import net.sumik.sync.compat.curios.CuriosShellStateComponent;
 import net.sumik.sync.common.entity.KillableEntity;
 import net.sumik.sync.common.utils.BlockPosUtil;
 import net.sumik.sync.common.utils.WorldUtil;
@@ -191,6 +192,10 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         ShellStateComponent playerComponent = ShellStateComponent.of(serverPlayer);
         playerComponent.clone(state.getComponent());
 
+        if (playerComponent instanceof CuriosShellStateComponent curiosComponent) {
+            curiosComponent.applyToPlayer(serverPlayer);
+        }
+
         serverPlayer.setGameMode(GameType.byId(state.getGameMode()));
         this.setHealth(state.getHealth());
         this.experienceLevel = state.getExperienceLevel();
@@ -311,7 +316,8 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
     @Override
     public boolean updateKillableEntityPostDeath() {
         this.deathTime = Mth.clamp(++this.deathTime, 0, 20);
-        if (this.isArtificial && this.shellsById.values().stream().anyMatch(x -> this.canBeApplied(x) && x.getProgress() >= ShellState.PROGRESS_DONE)) {
+        boolean hasShells = this.shellsById.values().stream().anyMatch(x -> this.canBeApplied(x) && x.getProgress() >= ShellState.PROGRESS_DONE);
+        if (hasShells) {
             return true;
         }
 
@@ -332,14 +338,12 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         Component text = this.getCombatTracker().getDeathMessage();
         this.connection.send(new ClientboundPlayerCombatKillPacket(this.getId(), text));
         Team team = this.getTeam();
-        if (team != null && team.getDeathMessageVisibility() != Team.Visibility.ALWAYS) {
-            if (team.getDeathMessageVisibility() == Team.Visibility.HIDE_FOR_OTHER_TEAMS) {
-                this.server.getPlayerList().broadcastSystemToTeam(this, text);
-            } else if (team.getDeathMessageVisibility() == Team.Visibility.HIDE_FOR_OWN_TEAM) {
-                this.server.getPlayerList().broadcastSystemToAllExceptTeam(this, text);
-            }
-        } else {
+        if (team == null || team.getDeathMessageVisibility() == Team.Visibility.ALWAYS) {
             this.server.getPlayerList().broadcastSystemMessage(text, false);
+        } else if (team.getDeathMessageVisibility() == Team.Visibility.HIDE_FOR_OTHER_TEAMS) {
+            this.server.getPlayerList().broadcastSystemToTeam(this, text);
+        } else if (team.getDeathMessageVisibility() == Team.Visibility.HIDE_FOR_OWN_TEAM) {
+            this.server.getPlayerList().broadcastSystemToAllExceptTeam(this, text);
         }
     }
 
@@ -426,6 +430,7 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
 
         if (this.level() == targetWorld) {
             this.connection.teleport(x, y, z, yaw, pitch);
+            this.isChangingDimension = false;
             return;
         }
 
@@ -459,6 +464,6 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         for (MobEffectInstance effectInstance : this.getActiveEffects()) {
             this.connection.send(new ClientboundUpdateMobEffectPacket(this.getId(), effectInstance));
         }
-        this.triggerDimensionChangeTriggers(targetWorld);
+        this.isChangingDimension = false;
     }
 }
