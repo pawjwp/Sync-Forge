@@ -234,75 +234,152 @@ public class SyncConfig {
         public final BooleanValue enableDeathRespawnAnimation;
 
         public CommonConfig(Builder builder) {
+
             builder.comment("Sync Configuration").push("general");
             builder.comment("Shell Construction Settings").push("construction");
-            this.enableInstantShellConstruction = builder.comment("Enable instant shell construction (creative mode-like)")
-                .define("enableInstantShellConstruction", false);
-            this.warnPlayerInsteadOfKilling = builder.comment("Warn player instead of killing them on sync failure").define("warnPlayerInsteadOfKilling", false);
-            this.mustMaintainOriginalBody = builder.comment("If the original body must be remain alive to allow syncing").define("mustMaintainOriginalBody", false);
-            this.fingerstickDamage = builder.comment("Damage dealt by fingerstick (0-100)").defineInRange("fingerstickDamage", 20.0, 0.0, 100.0);
-            this.hardcoreFingerstickDamage = builder.comment("Damage dealt by fingerstick in hardcore mode (0-100)")
-                .defineInRange("hardcoreFingerstickDamage", 40.0, 0.0, 100.0);
-            this.shellConstructionRequiredItem = builder.comment(
-                    "Item required to construct a new shell (format: 'modid:itemname', e.g., 'minecraft:ender_pearl')",
-                    "Leave empty to disable item requirement"
-                )
-                .define("shellConstructionRequiredItem", "");
-            this.shellConstructionItemCount = builder.comment("Number of items consumed when constructing a shell")
-                .defineInRange("shellConstructionItemCount", 1, 1, 64);
-            this.consumeItemInCreative = builder.comment("Should the required item be consumed in creative mode?").define("consumeItemInCreative", false);
-            this.missingItemMessage = builder.comment("Custom error message when missing required item (use %s for item name, %d for count)")
-                .define("missingItemMessage", "You need %s x%d to construct a new shell!");
-            builder.pop();
+
+            this.enableInstantShellConstruction = builder
+                    .comment("Enable instant shell construction (creative mode-like)")
+                    .define("enableInstantShellConstruction", false);
+
+            this.warnPlayerInsteadOfKilling = builder
+                    .comment("Warn player instead of killing them on sync failure")
+                    .define("warnPlayerInsteadOfKilling", false);
+
+            this.mustMaintainOriginalBody = builder
+                    .comment("If the original body must be remain alive to allow syncing")
+                    .define("mustMaintainOriginalBody", false);
+
+            this.fingerstickDamage = builder
+                    .comment("Damage dealt by fingerstick (0-100)")
+                    .defineInRange("fingerstickDamage", 20.0, 0.0, 100.0);
+
+            this.hardcoreFingerstickDamage = builder
+                    .comment("Damage dealt by fingerstick in hardcore mode (0-100)")
+                    .defineInRange("hardcoreFingerstickDamage", 40.0, 0.0, 100.0);
+
+            this.shellConstructionRequiredItem = builder
+                    .comment(
+                            "Item required to construct a new shell (format: 'modid:itemname', e.g., 'minecraft:ender_pearl')",
+                            "Leave empty to disable item requirement")
+                    .define("shellConstructionRequiredItem", "");
+
+            this.shellConstructionItemCount = builder
+                    .comment("Number of items consumed when constructing a shell")
+                    .defineInRange("shellConstructionItemCount", 1, 1, 64);
+
+            this.consumeItemInCreative = builder
+                    .comment("Should the required item be consumed in creative mode?")
+                    .define("consumeItemInCreative", false);
+
+            this.missingItemMessage = builder
+                    .comment("Custom error message when missing required item (use %s for item name, %d for count)")
+                    .define("missingItemMessage", "You need %s x%d to construct a new shell!");
+
+            builder.pop(); // construction
+
             builder.comment("Shell Storage Settings").push("storage");
-            this.shellConstructorCapacity = builder.comment("Energy capacity of shell constructor")
-                .defineInRange("shellConstructorCapacity", 256000L, 1000L, Long.MAX_VALUE);
-            this.shellStorageCapacity = builder.comment("Energy capacity of shell storage").defineInRange("shellStorageCapacity", 320L, 10L, Long.MAX_VALUE);
-            this.shellStorageConsumption = builder.comment("Energy consumption per tick for shell storage")
-                .defineInRange("shellStorageConsumption", 16L, 1L, 1000L);
-            this.shellStorageAcceptsRedstone = builder.comment("Whether shell storage accepts redstone power").define("shellStorageAcceptsRedstone", true);
-            this.shellStorageMaxUnpoweredLifespan = builder.comment("Maximum ticks shell storage can run without power")
-                .defineInRange("shellStorageMaxUnpoweredLifespan", 20, 0, 1200);
-            builder.pop();
+
+            this.shellConstructorCapacity = builder
+                    .comment("Energy capacity of shell constructor")
+                    .defineInRange("shellConstructorCapacity", 256000L, 1000L, Long.MAX_VALUE);
+
+            this.shellStorageCapacity = builder
+                    .comment("Energy capacity of shell storage")
+                    .defineInRange("shellStorageCapacity", 320L, 10L, Long.MAX_VALUE);
+
+            this.shellStorageConsumption = builder
+                    .comment("Energy consumption per tick for shell storage")
+                    .defineInRange("shellStorageConsumption", 16L, 1L, 1000L);
+
+            this.shellStorageAcceptsRedstone = builder
+                    .comment("Whether shell storage accepts redstone power")
+                    .define("shellStorageAcceptsRedstone", true);
+
+            this.shellStorageMaxUnpoweredLifespan = builder
+                    .comment("Maximum ticks shell storage can run without power")
+                    .defineInRange("shellStorageMaxUnpoweredLifespan", 20, 0, 1200);
+
+            builder.pop(); // storage
+
             builder.comment("Energy Generation").push("energy");
-            this.energyMapEntries = builder.comment("Entity energy output mapping (format: 'modid:entity=energyAmount')")
-                .defineList(
-                    "energyMap",
-                    Arrays.asList(
-                        "minecraft:chicken=2",
-                        "minecraft:pig=16",
-                        "minecraft:player=20",
-                        "minecraft:wolf=22",
-                        "minecraft:villager=25",
-                        "minecraft:creeper=80",
-                        "minecraft:enderman=160"
-                    ),
-                    obj -> obj instanceof String && ((String)obj).contains("=")
-                );
-            builder.pop();
+
+            this.energyMapEntries = builder
+                    .comment("Entity energy output mapping (format: 'modid:entity=energyAmount')")
+                    .defineList(
+                            "energyMap",
+                            Arrays.asList(
+                                    "minecraft:chicken=2",
+                                    "minecraft:pig=16",
+                                    "minecraft:player=20",
+                                    "minecraft:wolf=22",
+                                    "minecraft:villager=25",
+                                    "minecraft:creeper=80",
+                                    "minecraft:enderman=160"),
+                            obj -> obj instanceof String && ((String) obj).contains("="));
+
+            builder.pop(); // energy
+
             builder.comment("Gameplay Settings").push("gameplay");
-            this.syncPriority = builder.comment("Priority for shell selection (NATURAL, NEAREST, or color names)")
-                .defineEnum("syncPriority", ShellPriority.NATURAL);
-            builder.pop();
+
+            this.syncPriority = builder
+                    .comment("Priority for shell selection (NATURAL, NEAREST, or color names)")
+                    .defineEnum("syncPriority", ShellPriority.NATURAL);
+
+            builder.pop(); // gameplay
+
             builder.comment("Tools").push("tools");
-            this.wrench = builder.comment("Item to use as wrench (format: 'modid:item')").define("wrench", "minecraft:stick");
-            builder.pop();
+
+            this.wrench = builder
+                    .comment("Item to use as wrench (format: 'modid:item')")
+                    .define("wrench", "minecraft:stick");
+
+            builder.pop(); // tools
+
             builder.comment("Client Settings").push("client");
-            this.updateTranslationsAutomatically = builder.comment("Automatically update translations").define("updateTranslationsAutomatically", false);
-            this.enableShellSwitchAnimation = builder.comment("Enable camera animation when switching between shells").define("enableShellSwitchAnimation", true);
-            this.enableDeathRespawnAnimation = builder.comment("Enable camera animation when respawning into a shell after death")
-                .define("enableDeathRespawnAnimation", true);
-            builder.pop();
+
+            this.updateTranslationsAutomatically = builder
+                    .comment("Automatically update translations")
+                    .define("updateTranslationsAutomatically", false);
+
+            this.enableShellSwitchAnimation = builder
+                    .comment("Enable camera animation when switching between shells")
+                    .define("enableShellSwitchAnimation", true);
+
+            this.enableDeathRespawnAnimation = builder
+                    .comment("Enable camera animation when respawning into a shell after death")
+                    .define("enableDeathRespawnAnimation", true);
+
+            builder.pop(); // client
+
             builder.comment("Easter Eggs").push("easter_eggs");
-            this.enableTechnobladeEasterEgg = builder.comment("Enable Technoblade easter egg").define("enableTechnobladeEasterEgg", true);
-            this.renderTechnobladeCape = builder.comment("Render Technoblade's cape").define("renderTechnobladeCape", false);
-            this.allowTechnobladeAnnouncements = builder.comment("Allow Technoblade announcements").define("allowTechnobladeAnnouncements", true);
-            this.allowTechnobladeQuotes = builder.comment("Allow Technoblade quotes").define("allowTechnobladeQuotes", true);
-            this.technobladeQuoteDelay = builder.comment("Delay between Technoblade quotes (in ticks)").defineInRange("technobladeQuoteDelay", 1800, 200, 72000);
-            this.technobladeUuids = builder.comment("UUIDs of players to treat as Technoblade")
-                .defineList("technobladeUuids", new ArrayList<>(), obj -> obj instanceof String);
-            builder.pop();
-            builder.pop();
+
+            this.enableTechnobladeEasterEgg = builder
+                    .comment("Enable Technoblade easter egg")
+                    .define("enableTechnobladeEasterEgg", true);
+
+            this.renderTechnobladeCape = builder
+                    .comment("Render Technoblade's cape").define("renderTechnobladeCape",
+                            false);
+
+            this.allowTechnobladeAnnouncements = builder
+                    .comment("Allow Technoblade announcements")
+                    .define("allowTechnobladeAnnouncements", true);
+
+            this.allowTechnobladeQuotes = builder
+                    .comment("Allow Technoblade quotes").define("allowTechnobladeQuotes",
+                            true);
+
+            this.technobladeQuoteDelay = builder
+                    .comment("Delay between Technoblade quotes (in ticks)")
+                    .defineInRange("technobladeQuoteDelay", 1800, 200, 72000);
+
+            this.technobladeUuids = builder
+                    .comment("UUIDs of players to treat as Technoblade")
+                    .defineList("technobladeUuids", new ArrayList<>(), obj -> obj instanceof String);
+
+            builder.pop(); // easter eggs
+            builder.pop(); // general
         }
     }
 
