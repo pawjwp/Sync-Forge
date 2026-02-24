@@ -61,7 +61,7 @@ public class ShellStorageBlockEntity extends AbstractShellContainerBlockEntity i
         super.onServerTick(world, pos, state);
 
         SyncConfig config = SyncConfig.getInstance();
-        boolean infinitePower = config.shellStorageConsumption() == 0;
+        boolean infinitePower = config.shellStorageConsumption() <= 0;
         boolean isReceivingRedstonePower = !infinitePower
                 && config.shellStorageAcceptsRedstone()
                 && ShellStorageBlock.isEnabled(state);
@@ -139,7 +139,7 @@ public class ShellStorageBlockEntity extends AbstractShellContainerBlockEntity i
     // IEnergyStorage implementation
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        if (SyncConfig.getInstance().shellStorageConsumption() == 0) {
+        if (SyncConfig.getInstance().shellStorageConsumption() <= 0) {
             return 0;
         }
 
@@ -171,7 +171,7 @@ public class ShellStorageBlockEntity extends AbstractShellContainerBlockEntity i
 
     @Override
     public int getMaxEnergyStored() {
-        return Math.toIntExact(SyncConfig.getInstance().shellStorageConsumption() == 0 ? 0 : SyncConfig.getInstance().shellStorageCapacity());
+        return Math.toIntExact(SyncConfig.getInstance().shellStorageConsumption() <= 0 ? 0 : SyncConfig.getInstance().shellStorageCapacity());
     }
 
     @Override
@@ -181,7 +181,7 @@ public class ShellStorageBlockEntity extends AbstractShellContainerBlockEntity i
 
     @Override
     public boolean canReceive() {
-        return SyncConfig.getInstance().shellStorageConsumption() != 0;
+        return SyncConfig.getInstance().shellStorageConsumption() > 0;
     }
 
     @Override

@@ -290,7 +290,7 @@ public class SyncConfig {
 
             this.shellStorageConsumption = builder
                     .comment("Energy consumption per tick for shell storage")
-                    .defineInRange("shellStorageConsumption", 16L, 1L, 1000L);
+                    .defineInRange("shellStorageConsumption", 16L, 0L, 1000L);
 
             this.shellStorageAcceptsRedstone = builder
                     .comment("Whether shell storage accepts redstone power")
