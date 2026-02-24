@@ -70,8 +70,14 @@ dependencies {
         it.officialMojangMappings { nameSyntheticMembers = false }
 
     }
+
     // Optional mod compatibility
     modCompileOnly("curse.maven:curios-309927:6418456")
+
+
+    // Feature testing
+    modRuntimeOnly("curse.maven:curios-309927:6418456")
+    modRuntimeOnly("curse.maven:terra-curio-1027625:6566491")
 
     // Performance Mods
     modRuntimeOnly("curse.maven:embeddium-908741:5681725")
