@@ -19,6 +19,7 @@ import net.sumik.sync.common.item.SyncCreativeTabs;
 import net.sumik.sync.common.item.SyncItems;
 import net.sumik.sync.compat.curios.CuriosCompat;
 import net.sumik.sync.compat.diet.DietCompat;
+import net.sumik.sync.compat.thirst.ThirstCompat;
 import net.sumik.sync.networking.SyncPackets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +49,7 @@ public class Sync {
     private void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(CuriosCompat::init);
         event.enqueueWork(DietCompat::init);
+        event.enqueueWork(ThirstCompat::init);
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {

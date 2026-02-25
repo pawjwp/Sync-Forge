@@ -76,12 +76,16 @@ dependencies {
 
     modCompileOnly("curse.maven:diet-443570:4813904")
 
+    modCompileOnly("curse.maven:thirst-was-taken-679270:6660408")
+
     // Feature testing
     modRuntimeOnly("curse.maven:curios-309927:6418456")
     modRuntimeOnly("curse.maven:terra-curio-1027625:6566491")
 
     modRuntimeOnly("curse.maven:diet-443570:4813904")
     modRuntimeOnly("curse.maven:spectrelib-993948:5217603")
+
+    modRuntimeOnly("curse.maven:thirst-was-taken-679270:6660408")
 
     // Performance Mods
     modRuntimeOnly("curse.maven:embeddium-908741:5681725")

@@ -33,6 +33,8 @@ import net.sumik.sync.api.networking.ShellUpdatePacket;
 import net.sumik.sync.api.shell.*;
 import net.sumik.sync.common.config.SyncConfig;
 import net.sumik.sync.compat.curios.CuriosShellStateComponent;
+import net.sumik.sync.compat.diet.DietShellStateComponent;
+import net.sumik.sync.compat.thirst.ThirstShellStateComponent;
 import net.sumik.sync.common.entity.KillableEntity;
 import net.sumik.sync.common.utils.BlockPosUtil;
 import net.sumik.sync.common.utils.WorldUtil;
@@ -204,6 +206,16 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         CuriosShellStateComponent curiosComponent = playerComponent.as(CuriosShellStateComponent.class);
         if (curiosComponent != null) {
             curiosComponent.applyToPlayer(serverPlayer);
+        }
+
+        DietShellStateComponent dietComponent = playerComponent.as(DietShellStateComponent.class);
+        if (dietComponent != null) {
+            dietComponent.applyToPlayer(serverPlayer);
+        }
+
+        ThirstShellStateComponent thirstComponent = playerComponent.as(ThirstShellStateComponent.class);
+        if (thirstComponent != null) {
+            thirstComponent.applyToPlayer(serverPlayer);
         }
 
         serverPlayer.setGameMode(GameType.byId(state.getGameMode()));
