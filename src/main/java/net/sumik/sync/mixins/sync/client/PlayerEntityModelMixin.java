@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 @OnlyIn(Dist.CLIENT)
 @Mixin(PlayerModel.class)
-abstract class PlayerEntityModelMixin implements VoxelProvider {
+public abstract class PlayerEntityModelMixin implements VoxelProvider {
     @Shadow @Final
     private boolean slim;  // Forge uses 'slim' instead of 'thinArms'
 

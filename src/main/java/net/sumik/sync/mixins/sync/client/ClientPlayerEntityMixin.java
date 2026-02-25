@@ -217,6 +217,7 @@ public abstract class  ClientPlayerEntityMixin extends AbstractClientPlayer impl
                 .orElse(null) : null;
         if (respawnShell != null) {
             if (!SyncConfig.getInstance().enableDeathRespawnAnimation()) {
+                Direction facing = BlockPosUtil.getHorizontalFacing(pos, this.level()).orElse(this.getDirection().getOpposite());
                 SynchronizationRequestPacket request = new SynchronizationRequestPacket(respawnShell);
                 request.send();
                 HudController.hide();

@@ -106,8 +106,16 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
     @Override
     public Either<ShellState, PlayerSyncEvents.SyncFailureReason> sync(ShellState state) {
         ServerPlayer player = (ServerPlayer)(Object)this;
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        int i = 0;
+
+        while (i < Math.min(10, stackTrace.length)) {
+            i++;
+        }
+
         BlockPos currentPos = this.blockPosition();
         Level currentWorld = player.level();
+        this.shellsById.forEach((uuid, shell) -> {});
 
         if (!this.canBeApplied(state) || state.getProgress() < ShellState.PROGRESS_DONE) {
             return Either.right(PlayerSyncEvents.SyncFailureReason.INVALID_SHELL);
@@ -318,6 +326,9 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         this.deathTime = Mth.clamp(++this.deathTime, 0, 20);
         boolean hasShells = this.shellsById.values().stream().anyMatch(x -> this.canBeApplied(x) && x.getProgress() >= ShellState.PROGRESS_DONE);
         if (hasShells) {
+            if (this.isArtificial) {
+            }
+
             return true;
         }
 

@@ -61,6 +61,7 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
                 livingEntity.setSpeed(0.0F);
                 livingEntity.setDeltaMovement(Vec3.ZERO);
                 livingEntity.walkAnimation.setSpeed(0.0F);
+                livingEntity.walkAnimation.position(0.0F);
                 if (livingEntity instanceof Mob mob) {
                     mob.xxa = 0.0F;
                     mob.zza = 0.0F;
@@ -108,6 +109,7 @@ public class TreadmillBlockEntity extends BlockEntity implements DoubleBlockEnti
             } else {
                 if (this.runner instanceof LivingEntity livingEntity) {
                     livingEntity.walkAnimation.setSpeed(0.0F);
+                    livingEntity.walkAnimation.position(0.0F);
                 }
                 this.setRunner(null);
             }

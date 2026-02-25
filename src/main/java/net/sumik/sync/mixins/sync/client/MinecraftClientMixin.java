@@ -18,6 +18,8 @@ public abstract class MinecraftClientMixin {
      */
     @Redirect(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isDeadOrDying()Z", ordinal = 0), require = 1)
     private boolean sync$isPlayerDead(LocalPlayer player) {
-        return player.isDeadOrDying() && !DeathScreenController.isSuspended();
+        boolean isDead = player.isDeadOrDying();
+        boolean isSuspended = DeathScreenController.isSuspended();
+        return isDead && !isSuspended;
     }
 }
