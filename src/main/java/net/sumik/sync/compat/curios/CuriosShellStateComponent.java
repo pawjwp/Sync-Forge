@@ -25,7 +25,8 @@ public class CuriosShellStateComponent extends ShellStateComponent {
 
     @Override
     public void clone(ShellStateComponent component) {
-        if (component instanceof CuriosShellStateComponent other) {
+        CuriosShellStateComponent other = component.as(CuriosShellStateComponent.class);
+        if (other != null) {
             this.curiosStacks.clear();
             this.cosmeticStacks.clear();
             other.curiosStacks.forEach((id, stacks) -> {

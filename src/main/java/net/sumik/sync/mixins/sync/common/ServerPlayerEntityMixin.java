@@ -201,7 +201,8 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         ShellStateComponent playerComponent = ShellStateComponent.of(serverPlayer);
         playerComponent.clone(state.getComponent());
 
-        if (playerComponent instanceof CuriosShellStateComponent curiosComponent) {
+        CuriosShellStateComponent curiosComponent = playerComponent.as(CuriosShellStateComponent.class);
+        if (curiosComponent != null) {
             curiosComponent.applyToPlayer(serverPlayer);
         }
 
