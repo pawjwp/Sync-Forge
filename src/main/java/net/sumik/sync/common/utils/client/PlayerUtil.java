@@ -58,10 +58,17 @@ public final class PlayerUtil {
 
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
-        if (event.getLevel().isClientSide() && event.getEntity() == CLIENT.player) {
+        if (!event.getLevel().isClientSide()) {
+            return;
+        }
+        boolean isClientPlayer = event.getEntity() == CLIENT.player
+                || (CLIENT.player == null && event.getEntity() instanceof LocalPlayer);
+        if (isClientPlayer) {
+            LocalPlayer player = (LocalPlayer) event.getEntity();
             ClientLevel world = (ClientLevel) event.getLevel();
-            executeUpdates(CLIENT.player, world, UPDATES.get(WorldUtil.getId(world)));
-            executeUpdates(CLIENT.player, world, UPDATES.get(ANY_WORLD));
+            ResourceLocation worldId = WorldUtil.getId(world);
+            executeUpdates(player, world, UPDATES.get(worldId));
+            executeUpdates(player, world, UPDATES.get(ANY_WORLD));
         }
     }
 

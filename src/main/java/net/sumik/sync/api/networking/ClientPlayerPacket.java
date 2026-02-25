@@ -103,13 +103,14 @@ public interface ClientPlayerPacket extends PlayerPacket {
     @OnlyIn(Dist.CLIENT)
     default void execute(NetworkEvent.Context ctx) {
         Minecraft client = Minecraft.getInstance();
-        ClientPacketListener handler = client.getConnection();
 
-        if (handler == null) {
-            return;
-        }
 
         PlayerUtil.recordPlayerUpdate(this.getTargetWorldId(), (player, w, c) -> {
+            ClientPacketListener handler = client.getConnection();
+            if (handler == null) {
+                return;
+            }
+
             if (this.isBackgroundTask()) {
                 this.execute(client, player, handler, ctx);
             } else if (this.isRenderTask()) {
