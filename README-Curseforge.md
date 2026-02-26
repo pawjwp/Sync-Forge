@@ -43,15 +43,15 @@ _Features of the Fabric version that are not present in [the other Fabric 1.20.1
 
 ## How to play
 
-1. You need to craft a `shell constructor` and place it down.
-2. Then you need to provide it with a genetic sample (simply right-click it).\
-   **⚠️WARNING: with the default config, this action will KILL you!** In order to create a shell with full health, the constructor must absorb 20HP *(40 for Hardcore players)*. If you don't want to die, you can eat a golden apple to increase your maximum health, or you can hold a totem of undying during the process *(which is the only option for Hardcore players with default settings)*.
-3. The shell constructor needs power to work. You can use other modded power systems or use a `treadmill`, touching any side of the shell constructor. Lure a `pig`, a `wolf`, or certain hostile mobs to its center to start generating piggawatts.
-4. Once your new shell is constructed, you need to craft a `shell storage` and place it down.
-5. Supply it with `redstone power`.
-6. Once doors of the shell storage are open, you can `walk into it`.
-7. You'll see a radial `menu` that displays your shells
-8. `Select` the shell you want to transfer your mind into, and enjoy the process!
+- You need to craft a `shell constructor` and place it down.
+- Then you need to provide it with a genetic sample (simply right-click it).\
+ **⚠️WARNING: with the default config, this action will KILL you!** In order to create a shell with full health, the constructor must absorb 20HP *(40 for Hardcore players)*. If you don't want to die, you can eat a golden apple to increase your maximum health, or you can hold a totem of undying during the process *(which is the only option for Hardcore players with default settings)*.
+- The shell constructor needs power to work. You can use other modded power systems or use a `treadmill`, touching any side of the shell constructor. Lure a `pig`, a `wolf`, or certain hostile mobs to its center to start generating piggawatts.
+- Once your new shell is constructed, you need to craft a `shell storage` and place it down.
+- Supply it with `redstone power`.
+- Once doors of the shell storage are open, you can `walk into it`.
+- You'll see a radial `menu` that displays your shells
+- `Select` the shell you want to transfer your mind into, and enjoy the process!
 
 ---
 
@@ -250,7 +250,7 @@ The mod is highly configurable. [Cloth Config API](https://modrinth.com/mod/clot
 | `shellStorageMaxUnpoweredLifespan` | Determines how many ticks a shell can survive without a power supply connected to the corresponding shell storage | `20` |
 | `energyMap`                        | Specifies a list of entities that can produce energy via treadmills | (see above) |
 | `preserveOrigins`                  | If this option is enabled, all user shells will share the same [origins](https://www.curseforge.com/minecraft/mc-mods/origins) | `false` |
-| `syncPriority`                     | The order of shell selection for synchronization in case of death <br><br>Available `priority` values:<br><ul><li>`NATURAL` - non-artificial shells are prioritized</li><li>`NEAREST` - nearest shells are prioritized</li><li>`WHITE`, `ORANGE`, `MAGENTA`, `LIGHT_BLUE`, `YELLOW`, `LIME`, `PINK`, `GRAY`, `LIGHT_GRAY`, `CYAN`, `PURPLE`, `BLUE`, `BROWN`, `GREEN`, `RED`, `BLACK` - shells of the given color are prioritized</li><ul> | `[{ "priority": "NATURAL" }]` |
+| `syncPriority`                     | The order of shell selection for synchronization in case of death | `[{ "priority": "NATURAL" }]` |
 | `wrench`                           | Identifier of an item that can be used as a wrench in order to change a shell constructor's state | `minecraft:stick` |
 | `updateTranslationsAutomatically`  | If this option is enabled, translations will be updated every time the game is launched | `false` |
 
