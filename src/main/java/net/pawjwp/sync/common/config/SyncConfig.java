@@ -247,7 +247,7 @@ public class SyncConfig {
                     .define("warnPlayerInsteadOfKilling", false);
 
             this.mustMaintainOriginalBody = builder
-                    .comment("If the original body must be remain alive to allow syncing")
+                    .comment("If syncing on death will be blocked if an original (non-constructed) body died")
                     .define("mustMaintainOriginalBody", false);
 
             this.fingerstickDamage = builder
