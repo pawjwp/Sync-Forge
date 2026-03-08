@@ -2,8 +2,12 @@ package net.pawjwp.sync.compat.diet;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.pawjwp.sync.api.shell.ShellStateComponent;
 import com.illusivesoulworks.diet.common.capability.DietCapability;
 
@@ -33,7 +37,22 @@ public class DietShellStateComponent extends ShellStateComponent {
     }
 
     public void applyToPlayer(ServerPlayer player) {
+        // Removes all Diet attribute modifiers from every attribute
+        for (net.minecraft.world.entity.ai.attributes.Attribute attribute : ForgeRegistries.ATTRIBUTES.getValues()) {
+            AttributeInstance att = player.getAttribute(attribute);
+            if (att != null) {
+                for (UUID uuid : att.getModifiers().stream()
+                        .filter(mod -> "Diet group effect".equals(mod.getName()))
+                        .map(AttributeModifier::getId)
+                        .toList()) {
+                    att.removeModifier(uuid);
+                }
+            }
+        }
+
         DietCapability.get(player).ifPresent(tracker -> {
+            tracker.setModifiers(new HashMap<>());
+
             if (this.dietValues.isEmpty()) {
                 tracker.load(new CompoundTag());
             } else {
