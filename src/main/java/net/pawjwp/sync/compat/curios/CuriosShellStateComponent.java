@@ -1,6 +1,7 @@
 package net.pawjwp.sync.compat.curios;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,14 @@ public class CuriosShellStateComponent extends ShellStateComponent {
     @Override
     public String getId() {
         return "sync:curios";
+    }
+
+    @Override
+    public Collection<ItemStack> getItems() {
+        List<ItemStack> items = new ArrayList<>();
+        this.curiosStacks.values().forEach(items::addAll);
+        this.cosmeticStacks.values().forEach(items::addAll);
+        return items;
     }
 
     @Override
