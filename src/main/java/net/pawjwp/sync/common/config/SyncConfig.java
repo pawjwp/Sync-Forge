@@ -116,6 +116,10 @@ public class SyncConfig {
         return entries;
     }
 
+    public boolean transferIntoShellOnDeath() {
+        return COMMON.transferIntoShellOnDeath.get();
+    }
+
     public List<ShellPriorityEntry> syncPriority() {
         return List.of(new ShellPriorityEntry() {
             @Override
@@ -222,6 +226,7 @@ public class SyncConfig {
         public final IntValue shellStorageMaxUnpoweredLifespan;
         public final ConfigValue<List<? extends String>> energyMapEntries;
         public final EnumValue<ShellPriority> syncPriority;
+        public final BooleanValue transferIntoShellOnDeath;
         public final ConfigValue<String> wrench;
         public final BooleanValue updateTranslationsAutomatically;
         public final BooleanValue enableTechnobladeEasterEgg;
@@ -325,6 +330,11 @@ public class SyncConfig {
             this.syncPriority = builder
                     .comment("Priority for shell selection (NATURAL, NEAREST, or color names)")
                     .defineEnum("syncPriority", ShellPriority.NATURAL);
+
+            this.transferIntoShellOnDeath = builder
+                    .comment("Automatically transfer into a shell after dying.",
+                            "Whether players should be automatically synced into an available shell after dying.")
+                    .define("transferIntoShellOnDeath", true);
 
             builder.pop(); // gameplay
 

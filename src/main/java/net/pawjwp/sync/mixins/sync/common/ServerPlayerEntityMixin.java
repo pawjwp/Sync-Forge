@@ -311,6 +311,10 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
         
         SyncConfig config = SyncConfig.getInstance();
 
+        if (!config.transferIntoShellOnDeath()) {
+            return;
+        }
+
         if (!this.isArtificial && config.mustMaintainOriginalBody()) {
             return;
         }

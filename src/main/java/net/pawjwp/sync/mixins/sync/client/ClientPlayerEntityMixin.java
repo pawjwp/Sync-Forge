@@ -206,6 +206,10 @@ public abstract class  ClientPlayerEntityMixin extends AbstractClientPlayer impl
 
     @Override
     public void onKillableEntityDeath() {
+        if (!SyncConfig.getInstance().transferIntoShellOnDeath()) {
+            return;
+        }
+
         boolean canRespawn = this.sync$shellsById.values().stream()
                 .anyMatch(s -> this.canBeApplied(s) && s.getProgress() >= ShellState.PROGRESS_DONE);
         BlockPos pos = this.blockPosition();
