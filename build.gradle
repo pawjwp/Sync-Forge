@@ -20,7 +20,7 @@ java {
 loom {
     silentMojangMappingsLicense()
     forge {
-        accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
+        accessTransformer file("src/main/resources/META-INF/accesstransformer.cfg")
 
         mixinConfigs = [
                 "sync.mixins.json"
