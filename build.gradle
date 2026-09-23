@@ -60,6 +60,20 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven {
+        name = "JourneyMap (Public)"
+        url = "https://jm.gserv.me/repository/maven-public/"
+        content {
+            includeGroup "info.journeymap"
+        }
+    }
+    maven {
+        name = "New JourneyMap Maven"
+        url = "https://maven.blamejared.com"
+        content {
+            includeGroup "info.journeymap"
+        }
+    }
 }
 
 dependencies {
@@ -80,6 +94,8 @@ dependencies {
 
     modCompileOnly("curse.maven:thirst-was-taken-679270:6660408")
 
+    modCompileOnly("curse.maven:journeymap-32274:8923662")
+
     // Feature testing
     modRuntimeOnly("curse.maven:curios-309927:6418456")
     modRuntimeOnly("curse.maven:terra-curio-1027625:6566491")
@@ -88,6 +104,10 @@ dependencies {
     modRuntimeOnly("curse.maven:spectrelib-993948:5217603")
 
     modRuntimeOnly("curse.maven:thirst-was-taken-679270:6660408")
+
+    modRuntimeOnly("curse.maven:journeymap-32274:8923662")
+    modRuntimeOnly("curse.maven:common-network-806044:8357966")
+    modRuntimeOnly("info.journeymap:journeymap-api-forge:1.20.1-2.0.0")
 
     // Performance Mods
     modRuntimeOnly("curse.maven:embeddium-908741:5681725")

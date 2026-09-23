@@ -120,6 +120,10 @@ public class SyncConfig {
         return COMMON.transferIntoShellOnDeath.get();
     }
 
+    public boolean makeDeathWaypointOnSync() {
+        return COMMON.makeDeathWaypointOnSync.get();
+    }
+
     public List<ShellPriorityEntry> syncPriority() {
         return List.of(new ShellPriorityEntry() {
             @Override
@@ -227,6 +231,7 @@ public class SyncConfig {
         public final ConfigValue<List<? extends String>> energyMapEntries;
         public final EnumValue<ShellPriority> syncPriority;
         public final BooleanValue transferIntoShellOnDeath;
+        public final BooleanValue makeDeathWaypointOnSync;
         public final ConfigValue<String> wrench;
         public final BooleanValue updateTranslationsAutomatically;
         public final BooleanValue enableTechnobladeEasterEgg;
@@ -335,6 +340,10 @@ public class SyncConfig {
                     .comment("Automatically transfer into a shell after dying.",
                             "Whether players should be automatically synced into an available shell after dying.")
                     .define("transferIntoShellOnDeath", true);
+
+            this.makeDeathWaypointOnSync = builder
+                    .comment("Whether dying and transferring into a new shell will make Journeymap's death waypoint.")
+                    .define("makeDeathWaypointOnSync", true);
 
             builder.pop(); // gameplay
 

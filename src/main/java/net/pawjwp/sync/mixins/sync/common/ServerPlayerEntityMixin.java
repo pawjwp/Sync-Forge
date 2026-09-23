@@ -31,10 +31,10 @@ import net.pawjwp.sync.api.networking.PlayerIsAlivePacket;
 import net.pawjwp.sync.api.networking.ShellStateUpdatePacket;
 import net.pawjwp.sync.api.networking.ShellUpdatePacket;
 import net.pawjwp.sync.api.shell.*;
-import net.pawjwp.sync.api.shell.*;
 import net.pawjwp.sync.common.config.SyncConfig;
 import net.pawjwp.sync.compat.curios.CuriosShellStateComponent;
 import net.pawjwp.sync.compat.diet.DietShellStateComponent;
+import net.pawjwp.sync.compat.journeymap.JourneyMapCompat;
 import net.pawjwp.sync.compat.thirst.ThirstShellStateComponent;
 import net.pawjwp.sync.common.entity.KillableEntity;
 import net.pawjwp.sync.common.utils.BlockPosUtil;
@@ -337,6 +337,10 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
 
         if (!this.isSpectator()) {
             this.dropAllDeathLoot(source);
+        }
+
+        if (config.makeDeathWaypointOnSync()) {
+            JourneyMapCompat.makeDeathWaypoint((ServerPlayer)(Object)this);
         }
 
         this.undead = true;
