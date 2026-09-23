@@ -20,6 +20,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -32,6 +33,7 @@ import net.pawjwp.sync.api.networking.ShellStateUpdatePacket;
 import net.pawjwp.sync.api.networking.ShellUpdatePacket;
 import net.pawjwp.sync.api.shell.*;
 import net.pawjwp.sync.common.config.SyncConfig;
+import net.pawjwp.sync.common.item.SimpleInventory;
 import net.pawjwp.sync.compat.curios.CuriosShellStateComponent;
 import net.pawjwp.sync.compat.diet.DietShellStateComponent;
 import net.pawjwp.sync.compat.journeymap.JourneyMapCompat;
@@ -198,8 +200,25 @@ abstract class ServerPlayerEntityMixin extends Player implements ServerShell, Ki
 
         Inventory inventory = this.getInventory();
         int selectedSlot = inventory.selected;
+        SimpleInventory keptItems = new SimpleInventory();
+        if (this.isDeadOrDying()) {
+            keptItems.clone(inventory);
+        }
         state.getInventory().copyTo(inventory);
         inventory.selected = selectedSlot;
+
+        // Restores items that were kept in the inventory of a dead player (like items kept through keepInventory or various mods' soulbound items)
+        List<ItemStack> displacedItems = new ArrayList<>();
+        for (int i = 0; i < keptItems.getContainerSize(); i++) {
+            // Restores the slot of the kept item if empty. If not, adds it to displaced items list.
+            if (inventory.getItem(i).isEmpty()) {
+                inventory.setItem(i, keptItems.getItem(i));
+            } else {
+                displacedItems.add(keptItems.getItem(i));
+            }
+        }
+        // Place all displaced items back in the player's inventory (or drop)
+        displacedItems.forEach(inventory::placeItemBackInInventory);
 
         ShellStateComponent playerComponent = ShellStateComponent.of(serverPlayer);
         playerComponent.clone(state.getComponent());

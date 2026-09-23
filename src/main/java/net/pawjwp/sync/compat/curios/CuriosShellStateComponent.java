@@ -78,19 +78,11 @@ public class CuriosShellStateComponent extends ShellStateComponent {
 
     public void applyToPlayer(ServerPlayer player) {
         CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
+            Map<IDynamicStackHandler, List<ItemStack>> previousStacks = new HashMap<>();
             handler.getCurios().forEach((id, stackHandler) -> {
-                IDynamicStackHandler stacks = stackHandler.getStacks();
-
-                for (int i = 0; i < stacks.getSlots(); i++) {
-                    stacks.setStackInSlot(i, ItemStack.EMPTY);
-                }
-
+                previousStacks.put(stackHandler.getStacks(), removeAll(stackHandler.getStacks()));
                 if (stackHandler.hasCosmetic()) {
-                    IDynamicStackHandler cosmeticStacks = stackHandler.getCosmeticStacks();
-
-                    for (int i = 0; i < cosmeticStacks.getSlots(); i++) {
-                        cosmeticStacks.setStackInSlot(i, ItemStack.EMPTY);
-                    }
+                    previousStacks.put(stackHandler.getCosmeticStacks(), removeAll(stackHandler.getCosmeticStacks()));
                 }
             });
             this.curiosStacks.forEach((id, items) -> {
@@ -113,7 +105,29 @@ public class CuriosShellStateComponent extends ShellStateComponent {
                     }
                 }
             });
+
+            // Restores curios kept in the inventory to their original slots if possible, or other inventory slots/the ground if not possible
+            if (player.isDeadOrDying()) {
+                previousStacks.forEach((stacks, items) -> {
+                    for (int i = 0; i < items.size(); i++) {
+                        if (stacks.getStackInSlot(i).isEmpty()) {
+                            stacks.setStackInSlot(i, items.get(i));
+                        } else {
+                            player.getInventory().placeItemBackInInventory(items.get(i));
+                        }
+                    }
+                });
+            }
         });
+    }
+
+    private static List<ItemStack> removeAll(IDynamicStackHandler stacks) {
+        List<ItemStack> items = new ArrayList<>();
+        for (int i = 0; i < stacks.getSlots(); i++) {
+            items.add(stacks.getStackInSlot(i));
+            stacks.setStackInSlot(i, ItemStack.EMPTY);
+        }
+        return items;
     }
 
     @Override
